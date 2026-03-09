@@ -18,6 +18,8 @@ const defaultConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_API_BASE_URL,
   // 请求超时时间
   timeout: 10000,
+  // 跨域請求帶上 cookie（refreshToken 存於 HttpOnly cookie）
+  withCredentials: true,
   headers: {
     Accept: "application/json, text/plain, */*",
     "Content-Type": "application/json",
