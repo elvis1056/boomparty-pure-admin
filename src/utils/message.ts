@@ -6,36 +6,36 @@ type messageStyle = "el" | "antd";
 type messageTypes = "info" | "success" | "warning" | "error";
 
 interface MessageParams {
-  /** 消息类型，可选 `info` 、`success` 、`warning` 、`error` ，默认 `info` */
+  /** 訊息類型，可選 `info` 、`success` 、`warning` 、`error` ，預設 `info` */
   type?: messageTypes;
-  /** 是否纯色，默认 `false` */
+  /** 是否純色，預設 `false` */
   plain?: boolean;
-  /** 自定义图标，该属性会覆盖 `type` 的图标 */
+  /** 自訂圖標，該屬性會覆蓋 `type` 的圖標 */
   icon?: any;
-  /** 是否将 `message` 属性作为 `HTML` 片段处理，默认 `false` */
+  /** 是否將 `message` 屬性作為 `HTML` 片段處理，預設 `false` */
   dangerouslyUseHTMLString?: boolean;
-  /** 消息风格，可选 `el` 、`antd` ，默认 `antd` */
+  /** 訊息風格，可選 `el` 、`antd` ，預設 `antd` */
   customClass?: messageStyle;
-  /** 显示时间，单位为毫秒。设为 `0` 则不会自动关闭，`element-plus` 默认是 `3000` ，平台改成默认 `2000` */
+  /** 顯示時間，單位為毫秒。設為 `0` 則不會自動關閉，`element-plus` 預設是 `3000` ，平台改成預設 `2000` */
   duration?: number;
-  /** 是否显示关闭按钮，默认值 `false` */
+  /** 是否顯示關閉按鈕，預設值 `false` */
   showClose?: boolean;
-  /** `Message` 距离窗口顶部的偏移量，默认 `16` */
+  /** `Message` 距離窗口頂部的偏移量，預設 `16` */
   offset?: number;
-  /** 设置组件的根元素，默认 `document.body` */
+  /** 設置元件的根元素，預設 `document.body` */
   appendTo?: string | HTMLElement;
-  /** 合并内容相同的消息，不支持 `VNode` 类型的消息，默认值 `false` */
+  /** 合併內容相同的訊息，不支持 `VNode` 類型的訊息，預設值 `false` */
   grouping?: boolean;
-  /** 重复次数，类似于 `Badge` 。当和 `grouping` 属性一起使用时作为初始数量使用，默认值 `1` */
+  /** 重複次數，類似於 `Badge` 。當和 `grouping` 屬性一起使用時作為初始數量使用，預設值 `1` */
   repeatNum?: number;
-  /** 关闭时的回调函数, 参数为被关闭的 `message` 实例 */
+  /** 關閉時的回調函數, 參數為被關閉的 `message` 實例 */
   onClose?: Function | null;
 }
 
-/** 用法非常简单，参考 src/views/components/message/index.vue 文件 */
+/** 用法非常簡單，參考 src/views/components/message/index.vue 文件 */
 
 /**
- * `Message` 消息提示函数
+ * `Message` 訊息提示函數
  */
 const message = (
   message: string | VNode | (() => VNode),
@@ -82,7 +82,7 @@ const message = (
 };
 
 /**
- * 关闭所有 `Message` 消息提示函数
+ * 關閉所有 `Message` 訊息提示函數
  */
 const closeAllMessage = (): void => ElMessage.closeAll();
 

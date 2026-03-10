@@ -26,7 +26,7 @@ const getConfig = (key?: string): PlatformConfigs => {
   return config;
 };
 
-/** 获取项目动态全局配置 */
+/** 取得项目動態全局配置 */
 export const getPlatformConfig = async (app: App): Promise<undefined> => {
   app.config.globalProperties.$config = getConfig();
   return axios({
@@ -35,21 +35,21 @@ export const getPlatformConfig = async (app: App): Promise<undefined> => {
   })
     .then(({ data: config }) => {
       let $config = app.config.globalProperties.$config;
-      // 自动注入系统配置
+      // 自動注入系統配置
       if (app && $config && typeof config === "object") {
         $config = Object.assign($config, config);
         app.config.globalProperties.$config = $config;
-        // 设置全局配置
+        // 設置全局配置
         setConfig($config);
       }
       return $config;
     })
     .catch(() => {
-      throw "请在public文件夹下添加platform-config.json配置文件";
+      throw "請在public文件夾下添加platform-config.json配置文件";
     });
 };
 
-/** 本地响应式存储的命名空间 */
+/** 本地響應式存儲的命名空間 */
 const responsiveStorageNameSpace = () => getConfig().ResponsiveStorageNameSpace;
 
 export { getConfig, setConfig, responsiveStorageNameSpace };

@@ -13,17 +13,17 @@ import { useMultiTagsStoreHook } from "./multiTags";
 
 export const usePermissionStore = defineStore("pure-permission", {
   state: () => ({
-    // 静态路由生成的菜单
+    // 靜態路由生成的選單
     constantMenus,
-    // 整体路由生成的菜单（静态、动态）
+    // 整體路由生成的選單（靜態、動態）
     wholeMenus: [],
-    // 整体路由（一维数组格式）
+    // 整體路由（一維數組格式）
     flatteningRoutes: [],
-    // 缓存页面keepAlive
+    // 快取頁面keepAlive
     cachePageList: []
   }),
   actions: {
-    /** 组装整体路由生成的菜单 */
+    /** 組裝整體路由生成的選單 */
     handleWholeMenus(routes: any[]) {
       this.wholeMenus = filterNoPermissionTree(
         filterTree(ascending(this.constantMenus.concat(routes)))
@@ -32,7 +32,7 @@ export const usePermissionStore = defineStore("pure-permission", {
         this.constantMenus.concat(routes) as any
       );
     },
-    /** 监听缓存页面是否存在于标签页，不存在则删除 */
+    /** 監聽快取頁面是否存在於標籤頁，不存在則刪除 */
     clearCache() {
       let cacheLength = this.cachePageList.length;
       const nameList = getKeyList(useMultiTagsStoreHook().multiTags, "name");
@@ -62,7 +62,7 @@ export const usePermissionStore = defineStore("pure-permission", {
           break;
       }
     },
-    /** 清空缓存页面 */
+    /** 清空快取頁面 */
     clearAllCachePage() {
       this.wholeMenus = [];
       this.cachePageList = [];

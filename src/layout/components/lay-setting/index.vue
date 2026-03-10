@@ -43,7 +43,7 @@ const {
   setLayoutThemeColor
 } = useDataThemeChange();
 
-/* body添加layout属性，作用于src/style/sidebar.scss */
+/* body添加layout屬性，作用於src/style/sidebar.scss */
 if (unref(layoutTheme)) {
   const layout = unref(layoutTheme).layout;
   const theme = unref(layoutTheme).theme;
@@ -51,7 +51,7 @@ if (unref(layoutTheme)) {
   setLayoutModel(layout);
 }
 
-/** 默认灵动模式 */
+/** 預設靈動模式 */
 const markValue = ref($storage.configure?.showModel ?? "smart");
 
 const logoVal = ref($storage.configure?.showLogo ?? true);
@@ -73,7 +73,7 @@ const getThemeColorStyle = computed(() => {
   };
 });
 
-/** 当网页整体为暗色风格时不显示亮白色主题配色切换选项 */
+/** 當網頁整體為暗色風格時不顯示亮白色主題配色切換選項 */
 const showThemeColors = computed(() => {
   return themeColor => {
     return themeColor === "light" && isDark.value ? false : true;
@@ -86,34 +86,34 @@ function storageConfigureChange<T>(key: string, val: T): void {
   $storage.configure = storageConfigure;
 }
 
-/** 灰色模式设置 */
+/** 灰色模式設置 */
 const greyChange = (value): void => {
   const htmlEl = document.querySelector("html");
   toggleClass(settings.greyVal, "html-grey", htmlEl);
   storageConfigureChange("grey", value);
 };
 
-/** 色弱模式设置 */
+/** 色弱模式設置 */
 const weekChange = (value): void => {
   const htmlEl = document.querySelector("html");
   toggleClass(settings.weakVal, "html-weakness", htmlEl);
   storageConfigureChange("weak", value);
 };
 
-/** 隐藏标签页设置 */
+/** 隱藏標籤頁設置 */
 const tagsChange = () => {
   const showVal = settings.tabsVal;
   storageConfigureChange("hideTabs", showVal);
   emitter.emit("tagViewsChange", showVal as unknown as string);
 };
 
-/** 隐藏页脚设置 */
+/** 隱藏頁腳設置 */
 const hideFooterChange = () => {
   const hideFooter = settings.hideFooter;
   storageConfigureChange("hideFooter", hideFooter);
 };
 
-/** 标签页持久化设置 */
+/** 標籤頁持久化設置 */
 const multiTagsCacheChange = () => {
   const multiTagsCache = settings.multiTagsCache;
   storageConfigureChange("multiTagsCache", multiTagsCache);
@@ -127,7 +127,7 @@ function onChange({ option }) {
   emitter.emit("tagViewsShowModel", value);
 }
 
-/** 侧边栏Logo */
+/** 側邊欄Logo */
 function logoChange() {
   unref(logoVal)
     ? storageConfigureChange("showLogo", true)
@@ -141,16 +141,16 @@ function setFalse(Doms): any {
   });
 }
 
-/** 页宽 */
+/** 頁寬 */
 const stretchTypeOptions = computed<Array<OptionsType>>(() => {
   return [
     {
       label: "固定",
-      tip: "紧凑页面，轻松找到所需信息",
+      tip: "緊湊頁面，輕鬆找到所需信息",
       value: "fixed"
     },
     {
-      label: "自定义",
+      label: "自訂",
       tip: "最小1280、最大1600",
       value: "custom"
     }
@@ -167,7 +167,7 @@ const stretchTypeChange = ({ option }) => {
   value === "custom" ? setStretch(1440) : setStretch(false);
 };
 
-/** 主题色 激活选择项 */
+/** 主題色 激活選擇項 */
 const getThemeColor = computed(() => {
   return current => {
     if (
@@ -193,24 +193,24 @@ const pClass = computed(() => {
 const themeOptions = computed<Array<OptionsType>>(() => {
   return [
     {
-      label: "浅色",
+      label: "淺色",
       icon: DayIcon,
       theme: "light",
-      tip: "清新启航，点亮舒适的工作界面",
+      tip: "清新啟航，點亮舒適的工作界面",
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     },
     {
       label: "深色",
       icon: DarkIcon,
       theme: "dark",
-      tip: "月光序曲，沉醉于夜的静谧雅致",
+      tip: "月光序曲，沉醉於夜的靜謐雅致",
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     },
     {
-      label: "自动",
+      label: "自動",
       icon: SystemIcon,
       theme: "system",
-      tip: "同步时光，界面随晨昏自然呼应",
+      tip: "同步時光，界面隨晨昏自然呼應",
       iconAttrs: { fill: isDark.value ? "#fff" : "#000" }
     }
   ];
@@ -219,18 +219,18 @@ const themeOptions = computed<Array<OptionsType>>(() => {
 const markOptions = computed<Array<OptionsType>>(() => {
   return [
     {
-      label: "灵动",
-      tip: "灵动标签，添趣生辉",
+      label: "靈動",
+      tip: "靈動標籤，添趣生輝",
       value: "smart"
     },
     {
       label: "卡片",
-      tip: "卡片标签，高效浏览",
+      tip: "卡片標籤，高效瀏覽",
       value: "card"
     },
     {
       label: "谷歌",
-      tip: "谷歌风格，经典美观",
+      tip: "谷歌風格，經典美觀",
       value: "chrome"
     }
   ];
@@ -274,7 +274,7 @@ watch($storage, ({ layout }) => {
 
 const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
-/** 根据操作系统主题设置平台整体风格 */
+/** 根據操作系統主題設置平台整體風格 */
 function updateTheme() {
   if (overallStyle.value !== "system") return;
   if (mediaQueryList.matches) {
@@ -289,7 +289,7 @@ function removeMatchMedia() {
   mediaQueryList.removeEventListener("change", updateTheme);
 }
 
-/** 监听操作系统主题改变 */
+/** 監聽操作系統主題改變 */
 function watchSystemThemeChange() {
   updateTheme();
   removeMatchMedia();
@@ -297,7 +297,7 @@ function watchSystemThemeChange() {
 }
 
 onBeforeMount(() => {
-  /* 初始化系统配置 */
+  /* 初始化系統配置 */
   nextTick(() => {
     watchSystemThemeChange();
     settings.greyVal &&
@@ -315,7 +315,7 @@ onUnmounted(() => removeMatchMedia);
 <template>
   <LayPanel>
     <div class="p-5">
-      <p :class="pClass">整体风格</p>
+      <p :class="pClass">整體風格</p>
       <Segmented
         resize
         class="select-none"
@@ -333,7 +333,7 @@ onUnmounted(() => removeMatchMedia);
         "
       />
 
-      <p :class="['mt-5!', pClass]">主题色</p>
+      <p :class="['mt-5!', pClass]">主題色</p>
       <ul class="theme-color">
         <li
           v-for="(item, index) in themeColors"
@@ -352,12 +352,12 @@ onUnmounted(() => removeMatchMedia);
         </li>
       </ul>
 
-      <p :class="['mt-5!', pClass]">导航模式</p>
+      <p :class="['mt-5!', pClass]">導航模式</p>
       <ul class="pure-theme">
         <li
           ref="verticalRef"
           v-tippy="{
-            content: '左侧菜单，亲切熟悉',
+            content: '左側選單，親切熟悉',
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'vertical' ? 'is-select' : ''"
@@ -370,7 +370,7 @@ onUnmounted(() => removeMatchMedia);
           v-if="device !== 'mobile'"
           ref="horizontalRef"
           v-tippy="{
-            content: '顶部菜单，简洁概览',
+            content: '頂部選單，簡潔概覽',
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'horizontal' ? 'is-select' : ''"
@@ -383,7 +383,7 @@ onUnmounted(() => removeMatchMedia);
           v-if="device !== 'mobile'"
           ref="mixRef"
           v-tippy="{
-            content: '混合菜单，灵活多变',
+            content: '混合選單，靈活多變',
             zIndex: 41000
           }"
           :class="layoutTheme.layout === 'mix' ? 'is-select' : ''"
@@ -395,7 +395,7 @@ onUnmounted(() => removeMatchMedia);
       </ul>
 
       <span v-if="useAppStoreHook().getViewportWidth > 1280">
-        <p :class="['mt-5!', pClass]">页宽</p>
+        <p :class="['mt-5!', pClass]">頁寬</p>
         <Segmented
           resize
           class="mb-2 select-none"
@@ -436,7 +436,7 @@ onUnmounted(() => removeMatchMedia);
         </button>
       </span>
 
-      <p :class="['mt-4!', pClass]">页签风格</p>
+      <p :class="['mt-4!', pClass]">頁簽風格</p>
       <Segmented
         resize
         class="select-none"
@@ -445,15 +445,15 @@ onUnmounted(() => removeMatchMedia);
         @change="onChange"
       />
 
-      <p class="mt-5! font-medium text-sm dark:text-white">界面显示</p>
+      <p class="mt-5! font-medium text-sm dark:text-white">界面顯示</p>
       <ul class="setting">
         <li>
           <span class="dark:text-white">灰色模式</span>
           <el-switch
             v-model="settings.greyVal"
             inline-prompt
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="greyChange"
           />
         </li>
@@ -462,28 +462,28 @@ onUnmounted(() => removeMatchMedia);
           <el-switch
             v-model="settings.weakVal"
             inline-prompt
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="weekChange"
           />
         </li>
         <li>
-          <span class="dark:text-white">隐藏标签页</span>
+          <span class="dark:text-white">隱藏標籤頁</span>
           <el-switch
             v-model="settings.tabsVal"
             inline-prompt
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="tagsChange"
           />
         </li>
         <li>
-          <span class="dark:text-white">隐藏页脚</span>
+          <span class="dark:text-white">隱藏頁腳</span>
           <el-switch
             v-model="settings.hideFooter"
             inline-prompt
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="hideFooterChange"
           />
         </li>
@@ -494,18 +494,18 @@ onUnmounted(() => removeMatchMedia);
             inline-prompt
             :active-value="true"
             :inactive-value="false"
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="logoChange"
           />
         </li>
         <li>
-          <span class="dark:text-white">页签持久化</span>
+          <span class="dark:text-white">頁簽持久化</span>
           <el-switch
             v-model="settings.multiTagsCache"
             inline-prompt
-            active-text="开"
-            inactive-text="关"
+            active-text="開"
+            inactive-text="關"
             @change="multiTagsCacheChange"
           />
         </li>

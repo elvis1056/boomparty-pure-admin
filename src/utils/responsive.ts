@@ -8,17 +8,17 @@ export const injectResponsiveStorage = (app: App, config: PlatformConfigs) => {
   const nameSpace = responsiveStorageNameSpace();
   const configObj = Object.assign(
     {
-      // layout模式以及主题
+      // layout模式以及主題
       layout: Storage.getData("layout", nameSpace) ?? {
         layout: config.Layout ?? "vertical",
         theme: config.Theme ?? "light",
         darkMode: config.DarkMode ?? false,
         sidebarStatus: config.SidebarStatus ?? true,
         epThemeColor: config.EpThemeColor ?? "#409EFF",
-        themeColor: config.Theme ?? "light", // 主题色（对应系统配置中的主题色，与theme不同的是它不会受到浅色、深色整体风格切换的影响，只会在手动点击主题色时改变）
-        overallStyle: config.OverallStyle ?? "light" // 整体风格（浅色：light、深色：dark、自动：system）
+        themeColor: config.Theme ?? "light", // 主題色（對應系統配置中的主題色，與theme不同的是它不會受到淺色、深色整體風格切換的影響，只會在手動點擊主題色時改變）
+        overallStyle: config.OverallStyle ?? "light" // 整體風格（淺色：light、深色：dark、自動：system）
       },
-      // 系统配置-界面显示
+      // 系統配置-界面顯示
       configure: Storage.getData("configure", nameSpace) ?? {
         grey: config.Grey ?? false,
         weak: config.Weak ?? false,
@@ -32,7 +32,7 @@ export const injectResponsiveStorage = (app: App, config: PlatformConfigs) => {
     },
     config.MultiTagsCache
       ? {
-          // 默认显示顶级菜单tag
+          // 預設顯示頂級選單tag
           tags: Storage.getData("tags", nameSpace) ?? routerArrays
         }
       : {}

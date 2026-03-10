@@ -45,7 +45,7 @@ const handleSearch = useDebounceFn(search, 300);
 const historyNum = getConfig().MenuSearchHistory;
 const inputRef = ref<HTMLInputElement | null>(null);
 
-/** 菜单树形结构 */
+/** 選單樹形結構 */
 const menusData = computed(() => {
   return cloneDeep(usePermissionStoreHook().wholeMenus);
 });
@@ -89,7 +89,7 @@ function setStorageItem(key, value) {
   storageLocal().setItem(key, value);
 }
 
-/** 将菜单树形结构扁平化为一维数组，用于菜单查询 */
+/** 將選單樹形結構扁平化為一維數組，用於選單查詢 */
 function flatTree(arr) {
   const res = [];
   function deep(arr) {
@@ -102,7 +102,7 @@ function flatTree(arr) {
   return res;
 }
 
-/** 查询 */
+/** 查詢 */
 function search() {
   const flatMenusData = flatTree(menusData.value);
   resultOptions.value = flatMenusData.filter(menu =>
@@ -124,7 +124,7 @@ function search() {
 
 function handleClose() {
   show.value = false;
-  /** 延时处理防止用户看到某些操作 */
+  /** 延遲處理防止使用者看到某些操作 */
   setTimeout(() => {
     resultOptions.value = [];
     historyPath.value = "";
@@ -138,7 +138,7 @@ function scrollTo(index) {
   scrollbarRef.value.setScrollTop(scrollTop);
 }
 
-/** 获取当前选项和路径 */
+/** 取得目前選項和路徑 */
 function getCurrentOptionsAndPath() {
   const isResultOptions = resultOptions.value.length > 0;
   const options = isResultOptions ? resultOptions.value : historyOptions.value;
@@ -146,7 +146,7 @@ function getCurrentOptionsAndPath() {
   return { options, currentPath, isResultOptions };
 }
 
-/** 更新路径并滚动到指定项 */
+/** 更新路徑並捲動到指定项 */
 function updatePathAndScroll(newIndex, isResultOptions) {
   if (isResultOptions) {
     activePath.value = resultOptions.value[newIndex].path;
@@ -189,7 +189,7 @@ function handleEnter() {
   handleClose();
 }
 
-/** 删除历史记录 */
+/** 刪除歷史記錄 */
 function handleDelete(item) {
   const key = item.type === HISTORY_TYPE ? LOCALEHISTORYKEY : LOCALECOLLECTKEY;
   let list = getStorageItem(key);
@@ -198,7 +198,7 @@ function handleDelete(item) {
   getHistory();
 }
 
-/** 收藏历史记录 */
+/** 收藏歷史記錄 */
 function handleCollect(item) {
   let searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
   let searchCollectList = getStorageItem(LOCALECOLLECTKEY);
@@ -213,7 +213,7 @@ function handleCollect(item) {
   getHistory();
 }
 
-/** 存储搜索记录 */
+/** 存儲搜尋記錄 */
 function saveHistory() {
   const { path, meta } = resultOptions.value.find(
     item => item.path === activePath.value
@@ -230,7 +230,7 @@ function saveHistory() {
   }
 }
 
-/** 更新存储的搜索记录 */
+/** 更新存儲的搜尋記錄 */
 function updateHistory() {
   let searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
   const historyIndex = searchHistoryList.findIndex(
@@ -243,7 +243,7 @@ function updateHistory() {
   }
 }
 
-/** 获取本地历史记录 */
+/** 取得本地歷史記錄 */
 function getHistory() {
   const searchHistoryList = getStorageItem(LOCALEHISTORYKEY);
   const searchCollectList = getStorageItem(LOCALECOLLECTKEY);
@@ -251,7 +251,7 @@ function getHistory() {
   historyPath.value = historyOptions.value[0]?.path;
 }
 
-/** 拖拽改变收藏顺序 */
+/** 拖曳改變收藏順序 */
 function handleDrag(item: dragItem) {
   const searchCollectList = getStorageItem(LOCALECOLLECTKEY);
   const [reorderedItem] = searchCollectList.splice(item.oldIndex, 1);
@@ -289,7 +289,7 @@ onKeyStroke("ArrowDown", handleDown);
       v-model="keyword"
       size="large"
       clearable
-      placeholder="搜索菜单（支持拼音搜索）"
+      placeholder="搜尋選單（支持拼音搜尋）"
       @input="handleSearch"
     >
       <template #prefix>
@@ -301,7 +301,7 @@ onKeyStroke("ArrowDown", handleDown);
     </el-input>
     <div class="search-content">
       <el-scrollbar ref="scrollbarRef" max-height="calc(90vh - 140px)">
-        <el-empty v-if="showEmpty" description="暂无搜索结果" />
+        <el-empty v-if="showEmpty" description="暫無搜尋结果" />
         <SearchHistory
           v-if="showSearchHistory"
           ref="historyRef"

@@ -3,9 +3,9 @@ import { isObject } from "@pureadmin/utils";
 import type { Directive, DirectiveBinding } from "vue";
 
 export interface RippleOptions {
-  /** 自定义`ripple`颜色，支持`tailwindcss` */
+  /** 自訂`ripple`顏色，支持`tailwindcss` */
   class?: string;
-  /** 是否从中心扩散 */
+  /** 是否從中心擴散 */
   center?: boolean;
   circle?: boolean;
 }
@@ -31,13 +31,13 @@ const calculate = (
 ) => {
   const offset = el.getBoundingClientRect();
 
-  // 获取点击位置距离 el 的垂直和水平距离
+  // 取得點擊位置距離 el 的垂直和水平距離
   const localX = e.clientX - offset.left;
   const localY = e.clientY - offset.top;
 
   let radius = 0;
   let scale = 0.3;
-  // 计算点击位置到 el 顶点最远距离，即为圆的最大半径（勾股定理）
+  // 計算點擊位置到 el 頂點最遠距離，即為圓的最大半徑（勾股定理）
   if (el._ripple?.circle) {
     scale = 0.15;
     radius = el.clientWidth / 2;
@@ -48,11 +48,11 @@ const calculate = (
     radius = Math.sqrt(el.clientWidth ** 2 + el.clientHeight ** 2) / 2;
   }
 
-  // 中心点坐标
+  // 中心點坐標
   const centerX = `${(el.clientWidth - radius * 2) / 2}px`;
   const centerY = `${(el.clientHeight - radius * 2) / 2}px`;
 
-  // 点击位置坐标
+  // 點擊位置坐標
   const x = value.center ? centerX : `${localX - radius}px`;
   const y = value.center ? centerY : `${localY - radius}px`;
 
@@ -65,7 +65,7 @@ const ripples = {
       return;
     }
 
-    // 创建 ripple 元素和 ripple 父元素
+    // 建立 ripple 元素和 ripple 父元素
     const container = document.createElement("span");
     const animation = document.createElement("span");
 
@@ -87,9 +87,9 @@ const ripples = {
 
     el.appendChild(container);
 
-    // 获取目标元素样式表
+    // 取得目標元素樣式表
     const computed = window.getComputedStyle(el);
-    // 防止 position 被覆盖导致 ripple 位置有问题
+    // 防止 position 被覆蓋導致 ripple 位置有問題
     if (computed && computed.position === "static") {
       el.style.position = "relative";
       el.dataset.previousPosition = "static";

@@ -16,7 +16,7 @@ import { usePermissionStoreHook } from "./permission";
 
 export const useMultiTagsStore = defineStore("pure-multiTags", {
   state: () => ({
-    // 存储标签页信息（路由信息）
+    // 存儲標籤頁信息（路由信息）
     multiTags: storageLocal().getItem<StorageConfigs>(
       `${responsiveStorageNameSpace()}configure`
     )?.multiTagsCache
@@ -70,13 +70,13 @@ export const useMultiTagsStore = defineStore("pure-multiTags", {
         case "push":
           {
             const tagVal = value as multiType;
-            // 不添加到标签页
+            // 不添加到標籤頁
             if (tagVal?.meta?.hiddenTag) return;
-            // 如果是外链无需添加信息到标签页
+            // 如果是外鏈無需添加信息到標籤頁
             if (isUrl(tagVal?.name)) return;
-            // 如果title为空拒绝添加空信息到标签页
+            // 如果title為空拒絕添加空信息到標籤頁
             if (tagVal?.meta?.title.length === 0) return;
-            // showLink:false 不添加到标签页
+            // showLink:false 不添加到標籤頁
             if (isBoolean(tagVal?.meta?.showLink) && !tagVal?.meta?.showLink)
               return;
             const tagPath = tagVal.path;
@@ -90,14 +90,14 @@ export const useMultiTagsStore = defineStore("pure-multiTags", {
 
             if (tagHasExits) return;
 
-            // 动态路由可打开的最大数量
+            // 動態路由可打开的最大数量
             const dynamicLevel = tagVal?.meta?.dynamicLevel ?? -1;
             if (dynamicLevel > 0) {
               if (
                 this.multiTags.filter(e => e?.path === tagPath).length >=
                 dynamicLevel
               ) {
-                // 如果当前已打开的动态路由数大于dynamicLevel，替换第一个动态路由标签
+                // 如果目前已打開的動態路由數大於dynamicLevel，替換第一個動態路由標籤
                 const index = this.multiTags.findIndex(
                   item => item?.path === tagPath
                 );

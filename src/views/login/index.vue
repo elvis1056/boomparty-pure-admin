@@ -53,18 +53,18 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         })
         .then(res => {
           if (res.success) {
-            // 获取后端路由
+            // 取得後端路由
             return initRouter().then(() => {
               disabled.value = true;
               router
                 .push(getTopMenu(true).path)
                 .then(() => {
-                  message("登录成功", { type: "success" });
+                  message("登入成功", { type: "success" });
                 })
                 .finally(() => (disabled.value = false));
             });
           } else {
-            message("登录失败", { type: "error" });
+            message("登入失敗", { type: "error" });
           }
         })
         .finally(() => (loading.value = false));
@@ -92,7 +92,7 @@ useEventListener(document, "keydown", ({ code }) => {
   <div class="select-none">
     <img :src="bg" class="wave" />
     <div class="flex-c absolute right-5 top-3">
-      <!-- 主题 -->
+      <!-- 主題 -->
       <el-switch
         v-model="dataTheme"
         inline-prompt
@@ -123,7 +123,7 @@ useEventListener(document, "keydown", ({ code }) => {
                 :rules="[
                   {
                     required: true,
-                    message: '请输入账号',
+                    message: '請輸入帳號',
                     trigger: 'blur'
                   }
                 ]"
@@ -132,7 +132,7 @@ useEventListener(document, "keydown", ({ code }) => {
                 <el-input
                   v-model="ruleForm.username"
                   clearable
-                  placeholder="账号"
+                  placeholder="帳號"
                   :prefix-icon="useRenderIcon(User)"
                 />
               </el-form-item>
@@ -144,7 +144,7 @@ useEventListener(document, "keydown", ({ code }) => {
                   v-model="ruleForm.password"
                   clearable
                   show-password
-                  placeholder="密码"
+                  placeholder="密碼"
                   :prefix-icon="useRenderIcon(Lock)"
                 />
               </el-form-item>
@@ -159,7 +159,7 @@ useEventListener(document, "keydown", ({ code }) => {
                 :disabled="disabled"
                 @click="onLogin(ruleFormRef)"
               >
-                登录
+                登入
               </el-button>
             </Motion>
           </el-form>

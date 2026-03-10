@@ -27,10 +27,10 @@ const tippyFunc = ref();
 
 const isTextEllipsis = (el: HTMLElement) => {
   if (!props.lineClamp) {
-    // 单行省略判断
+    // 單行省略判斷
     return el.scrollWidth > el.clientWidth;
   } else {
-    // 多行省略判断
+    // 多行省略判斷
     return el.scrollHeight > el.clientHeight;
   }
 };

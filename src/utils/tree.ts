@@ -1,7 +1,7 @@
 /**
- * @description 提取菜单树中的每一项uniqueId
- * @param tree 树
- * @returns 每一项uniqueId组成的数组
+ * @description 提取選單樹中的每一項uniqueId
+ * @param tree 樹
+ * @returns 每一項uniqueId組成的數組
  */
 export const extractPathList = (tree: any[]): any => {
   if (!Array.isArray(tree)) {
@@ -21,10 +21,10 @@ export const extractPathList = (tree: any[]): any => {
 };
 
 /**
- * @description 如果父级下children的length为1，删除children并自动组建唯一uniqueId
- * @param tree 树
- * @param pathList 每一项的id组成的数组
- * @returns 组件唯一uniqueId后的树
+ * @description 如果父級下children的length為1，刪除children並自動組建唯一uniqueId
+ * @param tree 樹
+ * @param pathList 每一項的id組成的數組
+ * @returns 元件唯一uniqueId後的樹
  */
 export const deleteChildren = (tree: any[], pathList = []): any => {
   if (!Array.isArray(tree)) {
@@ -48,10 +48,10 @@ export const deleteChildren = (tree: any[], pathList = []): any => {
 };
 
 /**
- * @description 创建层级关系
- * @param tree 树
- * @param pathList 每一项的id组成的数组
- * @returns 创建层级关系后的树
+ * @description 建立層級關係
+ * @param tree 樹
+ * @param pathList 每一項的id組成的數組
+ * @returns 建立層級關係後的樹
  */
 export const buildHierarchyTree = (tree: any[], pathList = []): any => {
   if (!Array.isArray(tree)) {
@@ -72,10 +72,10 @@ export const buildHierarchyTree = (tree: any[], pathList = []): any => {
 };
 
 /**
- * @description 广度优先遍历，根据唯一uniqueId找当前节点信息
- * @param tree 树
+ * @description 廣度優先遍歷，根據唯一uniqueId找目前節點信息
+ * @param tree 樹
  * @param uniqueId 唯一uniqueId
- * @returns 当前节点信息
+ * @returns 目前節點信息
  */
 export const getNodeByUniqueId = (
   tree: any[],
@@ -96,11 +96,11 @@ export const getNodeByUniqueId = (
 };
 
 /**
- * @description 向当前唯一uniqueId节点中追加字段
- * @param tree 树
+ * @description 向目前唯一uniqueId節點中追加字段
+ * @param tree 樹
  * @param uniqueId 唯一uniqueId
  * @param fields 需要追加的字段
- * @returns 追加字段后的树
+ * @returns 追加字段後的樹
  */
 export const appendFieldByUniqueId = (
   tree: any[],
@@ -127,12 +127,12 @@ export const appendFieldByUniqueId = (
 };
 
 /**
- * @description 构造树型结构数据
- * @param data 数据源
- * @param id id字段 默认id
- * @param parentId 父节点字段，默认parentId
- * @param children 子节点字段，默认children
- * @returns 追加字段后的树
+ * @description 構造樹型結構資料
+ * @param data 資料源
+ * @param id id字段 預設id
+ * @param parentId 父節點字段，預設parentId
+ * @param children 子節點字段，預設children
+ * @returns 追加字段後的樹
  */
 export const handleTree = (
   data: any[],

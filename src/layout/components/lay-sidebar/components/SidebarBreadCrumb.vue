@@ -12,7 +12,7 @@ const routes: any = router.options.routes;
 const multiTags: any = useMultiTagsStoreHook().multiTags;
 
 const getBreadcrumb = (): void => {
-  // 当前路由信息
+  // 目前路由訊息
   let currentRoute;
 
   if (Object.keys(route.query).length > 0) {
@@ -31,16 +31,16 @@ const getBreadcrumb = (): void => {
     currentRoute = findRouteByPath(router.currentRoute.value.path, routes);
   }
 
-  // 当前路由的父级路径组成的数组
+  // 目前路由的父級路徑组成的數组
   const parentRoutes = getParentPaths(
     router.currentRoute.value.name as string,
     routes,
     "name"
   );
-  // 存放组成面包屑的数组
+  // 存放组成麵包屑的數組
   const matched = [];
 
-  // 获取每个父级路径对应的路由信息
+  // 取得每个父級路徑對應的路由訊息
   parentRoutes.forEach(path => {
     if (path !== "/") matched.push(findRouteByPath(path, routes));
   });

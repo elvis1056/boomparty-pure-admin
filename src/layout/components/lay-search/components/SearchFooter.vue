@@ -16,7 +16,7 @@ const { device } = useNav();
   <div class="search-footer text-[#333] dark:text-white">
     <span class="search-footer-item">
       <EnterOutlined class="icon" />
-      确认
+      確認
     </span>
     <span class="search-footer-item">
       <IconifyIconOffline :icon="ArrowUpLine" class="icon" />
@@ -25,7 +25,7 @@ const { device } = useNav();
     </span>
     <span class="search-footer-item">
       <MdiKeyboardEsc class="icon" />
-      关闭
+      關閉
     </span>
     <p v-if="device !== 'mobile' && total > 0" class="search-footer-total">
       {{ `共 ${total} 项` }}

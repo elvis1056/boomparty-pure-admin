@@ -26,12 +26,12 @@ import SettingIcon from "@/assets/table-bar/settings.svg?component";
 import CollapseIcon from "@/assets/table-bar/collapse.svg?component";
 
 const props = {
-  /** 头部最左边的标题 */
+  /** 頭部最左邊的標題 */
   title: {
     type: String,
     default: "列表"
   },
-  /** 对于树形表格，如果想启用展开和折叠功能，传入当前表格的ref即可 */
+  /** 對於樹型表格，如果想啟用展開和折疊功能，傳入目前表格的ref即可 */
   tableRef: {
     type: Object as PropType<any>
   },
@@ -172,7 +172,7 @@ export default defineComponent({
             style={getDropdownItemStyle.value("default")}
             onClick={() => (size.value = "default")}
           >
-            默认
+            預設
           </el-dropdown-item>
           <el-dropdown-item
             style={getDropdownItemStyle.value("small")}
@@ -200,7 +200,7 @@ export default defineComponent({
             const oldColumn = dynamicColumns.value[oldIndex];
             const newColumn = dynamicColumns.value[newIndex];
             if (oldColumn?.fixed || newColumn?.fixed) {
-              // 当前列存在fixed属性 则不可拖拽
+              // 目前列存在fixed屬性 則不可拖拽
               const oldThElem = wrapperElem.children[oldIndex] as HTMLElement;
               if (newIndex > oldIndex) {
                 wrapperElem.insertBefore(targetThElem, oldThElem);
@@ -377,7 +377,7 @@ export default defineComponent({
               <iconifyIconOffline
                 class={["w-[16px]", iconClass.value]}
                 icon={isFullscreen.value ? ExitFullscreen : Fullscreen}
-                v-tippy={isFullscreen.value ? "退出全屏" : "全屏"}
+                v-tippy={isFullscreen.value ? "退出全螢幕" : "全螢幕"}
                 onClick={() => onFullscreen()}
               />
             </div>

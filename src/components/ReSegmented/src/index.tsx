@@ -23,13 +23,13 @@ const props = {
     type: Array<OptionsType>,
     default: () => []
   },
-  /** 默认选中，按照第一个索引为 `0` 的模式，可选（`modelValue`只有传`number`类型时才为响应式） */
+  /** 預設選中，按照第一个索引為 `0` 的模式，可選（`modelValue`只有傳`number`類型時才為響應式） */
   modelValue: {
     type: undefined,
     require: false,
     default: "0"
   },
-  /** 将宽度调整为父元素宽度	 */
+  /** 將寬度調整為父元素寬度 */
   block: {
     type: Boolean,
     default: false
@@ -38,12 +38,12 @@ const props = {
   size: {
     type: String as PropType<"small" | "default" | "large">
   },
-  /** 是否全局禁用，默认 `false` */
+  /** 是否全局禁用，預設 `false` */
   disabled: {
     type: Boolean,
     default: false
   },
-  /** 当内容发生变化时，设置 `resize` 可使其自适应容器位置 */
+  /** 當內容發生變化時，設置 `resize` 可使其自適應容器位置 */
   resize: {
     type: Boolean,
     default: false

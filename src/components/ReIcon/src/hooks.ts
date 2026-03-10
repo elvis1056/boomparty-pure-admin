@@ -3,16 +3,16 @@ import { h, defineComponent, type Component } from "vue";
 import { FontIcon, IconifyIconOnline, IconifyIconOffline } from "../index";
 
 /**
- * 支持 `iconfont`、自定义 `svg` 以及 `iconify` 中所有的图标
- * @see 点击查看文档图标篇 {@link https://pure-admin.cn/pages/icon/}
- * @param icon 必传 图标
- * @param attrs 可选 iconType 属性
+ * 支持 `iconfont`、自訂 `svg` 以及 `iconify` 中所有的圖標
+ * @see 點擊查看文檔圖標篇 {@link https://pure-admin.cn/pages/icon/}
+ * @param icon 必傳 圖標
+ * @param attrs 可選 iconType 屬性
  * @returns Component
  */
 export function useRenderIcon(icon: any, attrs?: iconType): Component {
   // iconfont
   const ifReg = /^IF-/;
-  // typeof icon === "function" 属于SVG
+  // typeof icon === "function" 屬於SVG
   if (ifReg.test(icon)) {
     // iconfont
     const name = icon.split(ifReg)[1];
@@ -45,7 +45,7 @@ export function useRenderIcon(icon: any, attrs?: iconType): Component {
       }
     });
   } else {
-    // 通过是否存在 : 符号来判断是在线还是本地图标，存在即是在线图标，反之
+    // 通過是否存在 : 符號來判斷是在線還是本地圖標，存在即是在線圖標，反之
     return defineComponent({
       name: "Icon",
       render() {

@@ -14,7 +14,7 @@ export type appType = {
   sidebar: {
     opened: boolean;
     withoutAnimation: boolean;
-    // 判断是否手动点击Collapse
+    // 判斷是否手動點擊Collapse
     isClickCollapse: boolean;
   };
   layout: string;

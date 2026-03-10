@@ -1,7 +1,7 @@
 import { ElCol } from "element-plus";
 import { h, defineComponent } from "vue";
 
-// 封装element-plus的el-col组件
+// 封装element-plus的el-col元件
 export default defineComponent({
   name: "ReCol",
   props: {

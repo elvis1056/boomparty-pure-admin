@@ -27,7 +27,7 @@ function hoverTitle() {
 }
 
 function hoverDescription(event, description) {
-  // currentWidth 为文本在页面中所占的宽度，创建标签，加入到页面，获取currentWidth ,最后在移除
+  // currentWidth 為文本在頁面中所占的寬度，建立標籤，加入到頁面，取得currentWidth ,最後在移除
   const tempTag = document.createElement("span");
   tempTag.innerText = description;
   tempTag.className = "getDescriptionWidth";
@@ -37,10 +37,10 @@ function hoverDescription(event, description) {
   ).offsetWidth;
   document.querySelector(".getDescriptionWidth").remove();
 
-  // cellWidth为容器的宽度
+  // cellWidth為容器的寬度
   const cellWidth = event.target.offsetWidth;
 
-  // 当文本宽度大于容器宽度两倍时，代表文本显示超过两行
+  // 當文本寬度大於容器寬度兩倍時，代表文本顯示超過兩行
   currentWidth > 2 * cellWidth
     ? (descriptionTooltip.value = true)
     : (descriptionTooltip.value = false);

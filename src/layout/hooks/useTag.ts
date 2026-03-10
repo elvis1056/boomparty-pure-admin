@@ -39,17 +39,17 @@ export function useTags() {
   const translateX = ref(0);
   const visible = ref(false);
   const activeIndex = ref(-1);
-  // 当前右键选中的路由信息
+  // 目前右鍵選中的路由信息
   const currentSelect = ref({});
   const isScrolling = ref(false);
 
-  /** 显示模式，默认灵动模式 */
+  /** 顯示模式，預設靈動模式 */
   const showModel = ref(
     storageLocal().getItem<StorageConfigs>(
       `${responsiveStorageNameSpace()}configure`
     )?.showModel || "smart"
   );
-  /** 是否隐藏标签页，默认显示 */
+  /** 是否隱藏標籤頁，預設顯示 */
   const showTags =
     ref(
       storageLocal().getItem<StorageConfigs>(
@@ -63,49 +63,49 @@ export function useTags() {
   const tagsViews = reactive<Array<tagsViewsType>>([
     {
       icon: RefreshRight,
-      text: "重新加载",
+      text: "重新載入",
       divided: false,
       disabled: false,
       show: true
     },
     {
       icon: Close,
-      text: "关闭当前标签页",
+      text: "關閉目前標籤頁",
       divided: false,
       disabled: multiTags.value.length > 1 ? false : true,
       show: true
     },
     {
       icon: CloseLeftTags,
-      text: "关闭左侧标签页",
+      text: "關閉左側標籤頁",
       divided: true,
       disabled: multiTags.value.length > 1 ? false : true,
       show: true
     },
     {
       icon: CloseRightTags,
-      text: "关闭右侧标签页",
+      text: "關閉右側標籤頁",
       divided: false,
       disabled: multiTags.value.length > 1 ? false : true,
       show: true
     },
     {
       icon: CloseOtherTags,
-      text: "关闭其他标签页",
+      text: "關閉其他標籤頁",
       divided: true,
       disabled: multiTags.value.length > 2 ? false : true,
       show: true
     },
     {
       icon: CloseAllTags,
-      text: "关闭全部标签页",
+      text: "關閉全部標籤頁",
       divided: false,
       disabled: multiTags.value.length > 1 ? false : true,
       show: true
     },
     {
       icon: Fullscreen,
-      text: "内容区全屏",
+      text: "內容區全螢幕",
       divided: true,
       disabled: false,
       show: true
@@ -171,7 +171,7 @@ export function useTags() {
     visible.value = false;
   };
 
-  /** 鼠标移入添加激活样式 */
+  /** 滑鼠移入添加激活樣式 */
   function onMouseenter(index) {
     if (index) activeIndex.value = index;
     if (unref(showModel) === "smart") {
@@ -186,7 +186,7 @@ export function useTags() {
     }
   }
 
-  /** 鼠标移出恢复默认样式 */
+  /** 滑鼠移出恢復預設樣式 */
   function onMouseleave(index) {
     activeIndex.value = -1;
     if (unref(showModel) === "smart") {

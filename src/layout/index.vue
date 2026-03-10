@@ -83,7 +83,7 @@ function toggle(device: string, bool: boolean) {
   useAppStoreHook().toggleSideBar(bool, "resize");
 }
 
-// 判断是否可自动关闭菜单栏
+// 判斷是否可自動關閉選單欄
 let isAutoCloseSidebar = true;
 
 useResizeObserver(appWrapperRef, entries => {
@@ -92,10 +92,10 @@ useResizeObserver(appWrapperRef, entries => {
   const [{ inlineSize: width, blockSize: height }] = entry.borderBoxSize;
   useAppStoreHook().setViewportSize({ width, height });
   width <= 760 ? setTheme("vertical") : setTheme(useAppStoreHook().layout);
-  /** width app-wrapper类容器宽度
-   * 0 < width <= 760 隐藏侧边栏
-   * 760 < width <= 990 折叠侧边栏
-   * width > 990 展开侧边栏
+  /** width app-wrapper類容器寬度
+   * 0 < width <= 760 隱藏側邊欄
+   * 760 < width <= 990 折叠側邊欄
+   * width > 990 展开側邊欄
    */
   if (width > 0 && width <= 760) {
     toggle("mobile", false);
@@ -181,22 +181,22 @@ const LayHeader = defineComponent({
     >
       <div v-if="set.fixedHeader">
         <LayHeader />
-        <!-- 主体内容 -->
+        <!-- 主體內容 -->
         <LayContent :fixed-header="set.fixedHeader" />
       </div>
       <el-scrollbar v-else>
         <el-backtop
-          title="回到顶部"
+          title="回到頂部"
           target=".main-container .el-scrollbar__wrap"
         >
           <BackTopIcon />
         </el-backtop>
         <LayHeader />
-        <!-- 主体内容 -->
+        <!-- 主體內容 -->
         <LayContent :fixed-header="set.fixedHeader" />
       </el-scrollbar>
     </div>
-    <!-- 系统设置 -->
+    <!-- 系統設置 -->
     <LaySetting />
   </div>
 </template>

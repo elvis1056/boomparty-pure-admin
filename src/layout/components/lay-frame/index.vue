@@ -28,7 +28,7 @@ watch(useMultiTagsStoreHook().multiTags, (tags: any) => {
     return;
   }
   const iframeTags = tags.filter(i => i.meta?.frameSrc);
-  // tags必须是小于MAP，才是做了关闭动作，因为MAP插入的顺序在tags变化后发生
+  // tags必须是小於MAP，才是做了關閉動作，因为MAP插入的順序在tags變化後發生
   if (iframeTags.length < MAP.size) {
     for (const i of MAP.keys()) {
       if (!tags.some(s => s.path === i)) {
@@ -48,7 +48,7 @@ watch(
       if (iframeTags.length !== MAP.size) {
         const sameKey = [...MAP.keys()].find(i => path === i);
         if (!sameKey) {
-          // 添加缓存
+          // 添加快取
           setMap(path, props.currComp);
         }
       }

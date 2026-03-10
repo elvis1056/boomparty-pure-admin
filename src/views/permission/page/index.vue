@@ -45,12 +45,12 @@ function onChange() {
 <template>
   <div>
     <p class="mb-2!">
-      模拟后台根据不同角色返回对应路由，观察左侧菜单变化（管理员角色可查看系统管理菜单、普通角色不可查看系统管理菜单）
+      模擬後台根據不同角色返回對應路由，觀察左側選單變化（管理員角色可查看系統管理選單、普通角色不可查看系統管理選單）
     </p>
     <el-card shadow="never" :style="elStyle">
       <template #header>
         <div class="card-header">
-          <span>当前角色：{{ username }}</span>
+          <span>目前角色：{{ username }}</span>
         </div>
       </template>
       <el-select v-model="username" class="w-[160px]!" @change="onChange">

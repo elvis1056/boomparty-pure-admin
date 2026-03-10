@@ -6,17 +6,17 @@ class StorageProxy implements ProxyStorage {
   constructor(storageModel) {
     this.storage = storageModel;
     this.storage.config({
-      // 首选IndexedDB作为第一驱动，不支持IndexedDB会自动降级到localStorage（WebSQL被弃用，详情看https://developer.chrome.com/blog/deprecating-web-sql）
+      // 首選IndexedDB作為第一驅動，不支持IndexedDB會自動降級到localStorage（WebSQL被棄用，詳情看https://developer.chrome.com/blog/deprecating-web-sql）
       driver: [this.storage.INDEXEDDB, this.storage.LOCALSTORAGE],
       name: "pure-admin"
     });
   }
 
   /**
-   * @description 将对应键名的数据保存到离线仓库
-   * @param k 键名
-   * @param v 键值
-   * @param m 缓存时间（单位`分`，默认`0`分钟，永久缓存）
+   * @description 將對應鍵名的資料儲存到離線倉庫
+   * @param k 鍵名
+   * @param v 鍵值
+   * @param m 快取時間（單位`分`，預設`0`分鐘，永久快取）
    */
   public async setItem<T>(k: string, v: T, m = 0): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -35,8 +35,8 @@ class StorageProxy implements ProxyStorage {
   }
 
   /**
-   * @description 从离线仓库中获取对应键名的值
-   * @param k 键名
+   * @description 從離線倉庫中取得對應鍵名的值
+   * @param k 鍵名
    */
   public async getItem<T>(k: string): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -54,8 +54,8 @@ class StorageProxy implements ProxyStorage {
   }
 
   /**
-   * @description 从离线仓库中删除对应键名的值
-   * @param k 键名
+   * @description 從離線倉庫中刪除對應鍵名的值
+   * @param k 鍵名
    */
   public async removeItem(k: string) {
     return new Promise<void>((resolve, reject) => {
@@ -71,7 +71,7 @@ class StorageProxy implements ProxyStorage {
   }
 
   /**
-   * @description 从离线仓库中删除所有的键名，重置数据库
+   * @description 從離線倉庫中刪除所有的鍵名，重置資料庫
    */
   public async clear() {
     return new Promise<void>((resolve, reject) => {
@@ -87,7 +87,7 @@ class StorageProxy implements ProxyStorage {
   }
 
   /**
-   * @description 获取数据仓库中所有的key
+   * @description 取得資料倉庫中所有的key
    */
   public async keys() {
     return new Promise<string[]>((resolve, reject) => {
@@ -104,6 +104,6 @@ class StorageProxy implements ProxyStorage {
 }
 
 /**
- * 二次封装 [localforage](https://localforage.docschina.org/) 支持设置过期时间，提供完整的类型提示
+ * 二次封装 [localforage](https://localforage.docschina.org/) 支持設置過期時間，提供完整的類型提示
  */
 export const localForage = () => new StorageProxy(forage);

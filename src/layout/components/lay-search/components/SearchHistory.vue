@@ -16,7 +16,7 @@ interface Emits {
 
 const historyRef = ref();
 const innerHeight = ref();
-/** 判断是否停止鼠标移入事件处理 */
+/** 判斷是否停止滑鼠移入事件處理 */
 const stopMouseEvent = ref(false);
 
 const emit = defineEmits<Emits>();
@@ -78,7 +78,7 @@ function handleDelete(item) {
   emit("delete", item);
 }
 
-/** 鼠标移入 */
+/** 滑鼠移入 */
 async function handleMouse(item) {
   if (!stopMouseEvent.value) active.value = item.path;
 }
@@ -141,7 +141,7 @@ defineExpose({ handleScroll });
 <template>
   <div ref="historyRef" class="history">
     <template v-if="historyList.length">
-      <div :style="titleStyle">搜索历史</div>
+      <div :style="titleStyle">搜尋歷史</div>
       <div
         v-for="(item, index) in historyList"
         :key="item.path"
@@ -160,7 +160,7 @@ defineExpose({ handleScroll });
     </template>
     <template v-if="collectList.length">
       <div :style="titleStyle">
-        {{ `收藏${collectList.length > 1 ? "（可拖拽排序）" : ""}` }}
+        {{ `收藏${collectList.length > 1 ? "（可拖曳排序）" : ""}` }}
       </div>
       <div class="collect-container">
         <div

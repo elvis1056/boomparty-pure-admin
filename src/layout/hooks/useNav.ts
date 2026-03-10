@@ -24,7 +24,7 @@ export function useNav() {
   const routers = useRouter().options.routes;
   const { isFullscreen, toggle } = useFullscreen();
   const { wholeMenus } = storeToRefs(usePermissionStoreHook());
-  /** 平台`layout`中所有`el-tooltip`的`effect`配置，默认`light` */
+  /** 平台`layout`中所有`el-tooltip`的`effect`配置，預設`light` */
   const tooltipEffect = getConfig()?.TooltipEffect ?? "light";
 
   const getDivStyle = computed((): CSSProperties => {
@@ -37,14 +37,14 @@ export function useNav() {
     };
   });
 
-  /** 头像（如果头像为空则使用 src/assets/user.jpg ） */
+  /** 頭像（如果頭像為空則使用 src/assets/user.jpg ） */
   const userAvatar = computed(() => {
     return isAllEmpty(useUserStoreHook()?.avatar)
       ? Avatar
       : useUserStoreHook()?.avatar;
   });
 
-  /** 昵称（如果昵称为空则显示用户名） */
+  /** 暱稱（如果暱稱為空則顯示使用者名） */
   const username = computed(() => {
     return isAllEmpty(useUserStoreHook()?.nickname)
       ? useUserStoreHook()?.username
@@ -72,14 +72,14 @@ export function useNav() {
     return $config.Title;
   });
 
-  /** 动态title */
+  /** 動態title */
   function changeTitle(meta: routeMetaType) {
     const Title = getConfig().Title;
     if (Title) document.title = `${meta.title} | ${Title}`;
     else document.title = meta.title;
   }
 
-  /** 退出登录 */
+  /** 登出 */
   function logout() {
     useUserStoreHook().logOut();
   }
@@ -116,12 +116,12 @@ export function useNav() {
     emitter.emit("changLayoutRoute", indexPath);
   }
 
-  /** 判断路径是否参与菜单 */
+  /** 判斷路徑是否參與選單 */
   function isRemaining(path: string) {
     return remainingPaths.includes(path);
   }
 
-  /** 获取`logo` */
+  /** 取得`logo` */
   function getLogo() {
     return new URL("/logo.svg", import.meta.url).href;
   }

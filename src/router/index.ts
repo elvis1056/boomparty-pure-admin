@@ -37,9 +37,9 @@ import {
   multipleTabsKey
 } from "@/utils/auth";
 
-/** 自动导入全部静态路由，无需再手动引入！匹配 src/router/modules 目录（任何嵌套级别）中具有 .ts 扩展名的所有文件，除了 remaining.ts 文件
- * 如何匹配所有文件请看：https://github.com/mrmlnc/fast-glob#basic-syntax
- * 如何排除文件请看：https://cn.vitejs.dev/guide/features.html#negative-patterns
+/** 自動匯入全部靜態路由，無需再手動引入！匹配 src/router/modules 目錄（任何巢狀級別）中具有 .ts 擴展名的所有文件，除了 remaining.ts 文件
+ * 如何匹配所有文件請看：https://github.com/mrmlnc/fast-glob#basic-syntax
+ * 如何排除文件請看：https://cn.vitejs.dev/guide/features.html#negative-patterns
  */
 const modules: Record<string, any> = import.meta.glob(
   ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
@@ -48,32 +48,32 @@ const modules: Record<string, any> = import.meta.glob(
   }
 );
 
-/** 原始静态路由（未做任何处理） */
+/** 原始靜態路由（未做任何處理） */
 const routes = [];
 
 Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
 });
 
-/** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */
+/** 匯出處理后的靜態路由（三級及以上的路由全部拍成二級） */
 export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
   formatFlatteningRoutes(buildHierarchyTree(ascending(routes.flat(Infinity))))
 );
 
-/** 初始的静态路由，用于退出登录时重置路由 */
+/** 初始的靜態路由，用于登出時重置路由 */
 const initConstantRoutes: Array<RouteRecordRaw> = cloneDeep(constantRoutes);
 
-/** 用于渲染菜单，保持原始层级 */
+/** 用於渲染選單，保持原始層級 */
 export const constantMenus: Array<RouteComponent> = ascending(
   routes.flat(Infinity)
 ).concat(...remainingRouter);
 
-/** 不参与菜单的路由 */
+/** 不參與選單的路由 */
 export const remainingPaths = Object.keys(remainingRouter).map(v => {
   return remainingRouter[v].path;
 });
 
-/** 创建路由实例 */
+/** 建立路由實例 */
 export const router: Router = createRouter({
   history: getHistoryMode(import.meta.env.VITE_ROUTER_HISTORY),
   routes: constantRoutes.concat(...(remainingRouter as any)),
@@ -93,10 +93,10 @@ export const router: Router = createRouter({
   }
 });
 
-/** 记录已经加载的页面路径 */
+/** 紀錄已經載入的頁面路徑 */
 const loadedPaths = new Set<string>();
 
-/** 重置已加载页面记录 */
+/** 重置已載入頁面記錄 */
 export function resetLoadedPaths() {
   loadedPaths.clear();
 }
@@ -114,7 +114,7 @@ export function resetRouter() {
   resetLoadedPaths();
 }
 
-/** 路由白名单 */
+/** 路由白名單 */
 const whiteList = ["/login"];
 
 const { VITE_HIDE_HOME } = import.meta.env;
@@ -128,7 +128,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
 
   if (to.meta?.keepAlive) {
     handleAliveRoute(to, "add");
-    // 页面整体刷新和点击标签页刷新
+    // 頁面整體刷新和點擊標籤頁刷新
     if (_from.name === undefined || _from.name === "Redirect") {
       handleAliveRoute(to);
     }
@@ -143,21 +143,21 @@ router.beforeEach((to: ToRouteType, _from, next) => {
       else document.title = item.meta.title as string;
     });
   }
-  /** 如果已经登录并存在登录信息后不能跳转到路由白名单，而是继续保持在当前页面 */
+  /** 如果已經登入並存在登入信息后不能跳轉到路由白名單，而是繼續保持在目前頁面 */
   function toCorrectRoute() {
     whiteList.includes(to.fullPath) ? next(_from.fullPath) : next();
   }
   if (Cookies.get(multipleTabsKey) && userInfo) {
-    // 无权限跳转403页面
+    // 無權限跳轉403頁面
     if (to.meta?.roles && !isOneOfArray(to.meta?.roles, userInfo?.roles)) {
       next({ path: "/error/403" });
     }
-    // 开启隐藏首页后在浏览器地址栏手动输入首页welcome路由则跳转到404页面
+    // 開啟隱藏首頁后在瀏覽器地址欄手動輸入首頁welcome路由則跳轉到404頁面
     if (VITE_HIDE_HOME === "true" && to.fullPath === "/welcome") {
       next({ path: "/error/404" });
     }
     if (_from?.name) {
-      // name为超链接
+      // name為超連結
       if (externalLink) {
         openLink(to?.name as string);
         NProgress.done();
@@ -178,10 +178,10 @@ router.beforeEach((to: ToRouteType, _from, next) => {
               router.options.routes[0].children
             );
             getTopMenu(true);
-            // query、params模式路由传参数的标签页不在此处处理
+            // query、params模式路由傳參數的標籤頁不在此處處理
             if (route && route.meta?.title) {
               if (isAllEmpty(route.parentId) && route.meta?.backstage) {
-                // 此处为动态顶级路由（目录）
+                // 此處為動態頂級路由（目錄）
                 const { path, name, meta } = route.children[0];
                 useMultiTagsStoreHook().handleTags("push", {
                   path,
@@ -198,7 +198,7 @@ router.beforeEach((to: ToRouteType, _from, next) => {
               }
             }
           }
-          // 确保动态路由完全加入路由列表并且不影响静态路由（注意：动态路由刷新时router.beforeEach可能会触发两次，第一次触发动态路由还未完全添加，第二次动态路由才完全添加到路由列表，如果需要在router.beforeEach做一些判断可以在to.name存在的条件下去判断，这样就只会触发一次）
+          // 確保動態路由完全加入路由列表并且不影響靜態路由（注意：動態路由刷新时router.beforeEach可能會觸發兩次，第一次觸發動態路由還未完全添加，第二次動態路由才完全添加到路由列表，如果需要在router.beforeEach做一些判斷可以在to.name存在的條件下去判斷，這樣就只會觸發一次）
           if (isAllEmpty(to.name)) router.push(to.fullPath);
         });
       }

@@ -7,7 +7,7 @@ export interface CopyEl extends HTMLElement {
   copyValue: string;
 }
 
-/** 文本复制指令（默认双击复制） */
+/** 文本複製指令（預設雙擊複製） */
 export const copy: Directive = {
   mounted(el: CopyEl, binding: DirectiveBinding<string>) {
     const { value } = binding;
@@ -18,8 +18,8 @@ export const copy: Directive = {
       useEventListener(el, arg, () => {
         const success = copyTextToClipboard(el.copyValue);
         success
-          ? message("复制成功", { type: "success" })
-          : message("复制失败", { type: "error" });
+          ? message("複製成功", { type: "success" })
+          : message("複製失敗", { type: "error" });
       });
     } else {
       throw new Error(

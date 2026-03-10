@@ -18,48 +18,48 @@ import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
 export const useUserStore = defineStore("pure-user", {
   state: (): userType => ({
-    // 头像
+    // 頭像
     avatar: storageLocal().getItem<DataInfo<number>>(userKey)?.avatar ?? "",
-    // 用户名
+    // 使用者名
     username: storageLocal().getItem<DataInfo<number>>(userKey)?.username ?? "",
-    // 昵称
+    // 暱稱
     nickname: storageLocal().getItem<DataInfo<number>>(userKey)?.nickname ?? "",
-    // 页面级别权限
+    // 頁面級別權限
     roles: storageLocal().getItem<DataInfo<number>>(userKey)?.roles ?? [],
-    // 按钮级别权限
+    // 按鈕級別權限
     permissions:
       storageLocal().getItem<DataInfo<number>>(userKey)?.permissions ?? [],
-    // 是否勾选了登录页的免登录
+    // 是否勾選了登入頁的免登入
     isRemembered: false,
-    // 登录页的免登录存储几天，默认7天
+    // 登入頁的免登入存儲幾天，預設7天
     loginDay: 7
   }),
   actions: {
-    /** 存储头像 */
+    /** 存儲頭像 */
     SET_AVATAR(avatar: string) {
       this.avatar = avatar;
     },
-    /** 存储用户名 */
+    /** 存儲使用者名 */
     SET_USERNAME(username: string) {
       this.username = username;
     },
-    /** 存储昵称 */
+    /** 存儲暱稱 */
     SET_NICKNAME(nickname: string) {
       this.nickname = nickname;
     },
-    /** 存储角色 */
+    /** 存儲角色 */
     SET_ROLES(roles: Array<string>) {
       this.roles = roles;
     },
-    /** 存储按钮级别权限 */
+    /** 存儲按鈕級別權限 */
     SET_PERMS(permissions: Array<string>) {
       this.permissions = permissions;
     },
-    /** 存储是否勾选了登录页的免登录 */
+    /** 存儲是否勾選了登入頁的免登入 */
     SET_ISREMEMBERED(bool: boolean) {
       this.isRemembered = bool;
     },
-    /** 设置登录页的免登录存储几天 */
+    /** 設置登入頁的免登入存儲幾天 */
     SET_LOGINDAY(value: number) {
       this.loginDay = Number(value);
     },
@@ -76,7 +76,7 @@ export const useUserStore = defineStore("pure-user", {
           });
       });
     },
-    /** 前端登出（不调用接口） */
+    /** 前端登出（不調用接口） */
     logOut() {
       this.username = "";
       this.roles = [];

@@ -1,9 +1,9 @@
-// 按需引入element-plus（该方法稳定且明确。当然也支持：https://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5）
+// 按需引入element-plus（該方法穩定且明確。當然也支持：https://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5）
 import type { App, Component } from "vue";
 import {
   /**
-   * 为了方便演示平台将 element-plus 导出的所有组件引入，实际使用中如果你没用到哪个组件，将其注释掉就行
-   * 导出来源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/component.ts#L111-L211
+   * 為了方便演示平台將 element-plus 匯出的所有元件引入，實際使用中如果你沒用到哪個元件，將其註釋掉就行
+   * 匯出來源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/component.ts#L111-L211
    * */
   ElAffix,
   ElAlert,
@@ -109,15 +109,15 @@ import {
   ElTourStep,
   ElSegmented,
   /**
-   * 为了方便演示平台将 element-plus 导出的所有插件引入，实际使用中如果你没用到哪个插件，将其注释掉就行
-   * 导出来源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/plugin.ts#L11-L16
+   * 为了方便演示平台將 element-plus 匯出的所有插件引入，實際使用中如果你沒用到哪個插件，將其註釋掉就行
+   * 匯出來源：https://github.com/element-plus/element-plus/blob/dev/packages/element-plus/plugin.ts#L11-L16
    * */
   ElLoading, // v-loading 指令
   ElInfiniteScroll, // v-infinite-scroll 指令
   ElPopoverDirective, // v-popover 指令
-  ElMessage, // $message 全局属性对象globalProperties
-  ElMessageBox, // $msgbox、$alert、$confirm、$prompt 全局属性对象globalProperties
-  ElNotification // $notify 全局属性对象globalProperties
+  ElMessage, // $message 全局屬性對象globalProperties
+  ElMessageBox, // $msgbox、$alert、$confirm、$prompt 全局屬性對象globalProperties
+  ElNotification // $notify 全局屬性對象globalProperties
 } from "element-plus";
 
 const components = [
@@ -237,11 +237,11 @@ const plugins = [
 
 /** 按需引入`element-plus` */
 export function useElementPlus(app: App) {
-  // 全局注册组件
+  // 全局註冊元件
   components.forEach((component: Component) => {
     app.component(component.name, component);
   });
-  // 全局注册插件
+  // 全局註冊插件
   plugins.forEach(plugin => {
     app.use(plugin);
   });

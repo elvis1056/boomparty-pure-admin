@@ -6,11 +6,11 @@ export default [
     name: "Login",
     component: () => import("@/views/login/index.vue"),
     meta: {
-      title: "登录",
+      title: "登入",
       showLink: false
     }
   },
-  // 全屏403（无权访问）页面
+  // 全螢幕403（無權訪問）頁面
   {
     path: "/access-denied",
     name: "AccessDenied",
@@ -20,7 +20,7 @@ export default [
       showLink: false
     }
   },
-  // 全屏500（服务器出错）页面
+  // 全螢幕500（伺服器出錯）頁面
   {
     path: "/server-error",
     name: "ServerError",
@@ -34,7 +34,7 @@ export default [
     path: "/redirect",
     component: Layout,
     meta: {
-      title: "加载中...",
+      title: "載入中...",
       showLink: false
     },
     children: [

@@ -1,4 +1,4 @@
-// 这里存放本地图标，在 src/layout/index.vue 文件中加载，避免在首启动加载
+// 这里存放本地圖標，在 src/layout/index.vue 文件中載入，避免在首啟動載入
 import { getSvgInfo } from "@pureadmin/utils";
 import { addIcon } from "@iconify/vue/dist/offline";
 
@@ -17,7 +17,7 @@ const icons = [
   ["ri/information-line", RiInformationLine]
 ];
 
-// 本地菜单图标，后端在路由的 icon 中返回对应的图标字符串并且前端在此处使用 addIcon 添加即可渲染菜单图标
+// 本地選單圖標，後端在路由的 icon 中返回對應的圖標字符串並且前端在此處使用 addIcon 添加即可渲染選單圖標
 icons.forEach(([name, icon]) => {
   addIcon(name as string, getSvgInfo(icon as string));
 });

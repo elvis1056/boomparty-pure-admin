@@ -49,12 +49,12 @@ function getSubMenuData() {
   let path = "";
   path = defaultActive.value;
   subMenuData.value = [];
-  // path的上级路由组成的数组
+  // path的上級路由组成的數組
   const parentPathArr = getParentPaths(
     path,
     usePermissionStoreHook().wholeMenus
   );
-  // 当前路由的父级路由信息
+  // 目前路由的父級路由訊息
   const parenetRoute = findRouteByPath(
     parentPathArr[0] || path,
     usePermissionStoreHook().wholeMenus
@@ -81,7 +81,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  // 解绑`logoChange`公共事件，防止多次触发
+  // 解绑`logoChange`公共事件，防止多次觸發
   emitter.off("logoChange");
 });
 </script>

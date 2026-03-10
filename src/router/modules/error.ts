@@ -4,7 +4,7 @@ export default {
   meta: {
     icon: "ri/information-line",
     // showLink: false,
-    title: "异常页面",
+    title: "異常頁面",
     rank: 9
   },
   children: [

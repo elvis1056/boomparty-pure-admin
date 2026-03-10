@@ -26,7 +26,7 @@ export function useLayout() {
         overallStyle: $config?.OverallStyle ?? "light"
       };
     }
-    /** 灰色模式、色弱模式、隐藏标签页 */
+    /** 灰色模式、色弱模式、隱藏標籤頁 */
     if (!$storage.configure) {
       $storage.configure = {
         grey: $config?.Grey ?? false,
@@ -41,7 +41,7 @@ export function useLayout() {
     }
   };
 
-  /** 清空缓存后从platform-config.json读取默认配置并赋值到storage中 */
+  /** 清空快取後從platform-config.json讀取預設配置並賦值到storage中 */
   const layout = computed(() => {
     return $storage?.layout.layout;
   });
