@@ -13,7 +13,7 @@ import { stringify } from "qs";
 import { getToken, formatToken } from "@/utils/auth";
 import { useUserStoreHook } from "@/store/modules/user";
 
-// 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
+// 相關配置請參考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   baseURL: import.meta.env.VITE_API_BASE_URL,
   // 請求超時時間
@@ -25,7 +25,7 @@ const defaultConfig: AxiosRequestConfig = {
     "Content-Type": "application/json",
     "X-Requested-With": "XMLHttpRequest"
   },
-  // 數组格式參數序列化（https://github.com/axios/axios/issues/5142）
+  // 數組格式參數序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
     serialize: stringify as unknown as CustomParamsSerializer
   }
@@ -38,7 +38,10 @@ class PureHttp {
   }
 
   /** `token`過期後，暫存待執行的請求 */
-  private static requests = [];
+  private static requests: Array<{
+    resolve: (token: string) => void;
+    reject: (reason?: any) => void;
+  }> = [];
 
   /** 防止重複刷新`token` */
   private static isRefreshing = false;
@@ -51,10 +54,13 @@ class PureHttp {
 
   /** 重連原始請求 */
   private static retryOriginalRequest(config: PureHttpRequestConfig) {
-    return new Promise(resolve => {
-      PureHttp.requests.push((token: string) => {
-        config.headers["Authorization"] = formatToken(token);
-        resolve(config);
+    return new Promise((resolve, reject) => {
+      PureHttp.requests.push({
+        resolve: (token: string) => {
+          config.headers["Authorization"] = formatToken(token);
+          resolve(config);
+        },
+        reject
       });
     });
   }
@@ -63,7 +69,7 @@ class PureHttp {
   private httpInterceptorsRequest(): void {
     PureHttp.axiosInstance.interceptors.request.use(
       async (config: PureHttpRequestConfig): Promise<any> => {
-        // 優先判斷post/get等方法是否傳入回調，否則執行初始化設置等回調
+        // 優先判斷 post/get 等方法是否傳入回調，否則執行初始化設置等回調
         if (typeof config.beforeRequestCallback === "function") {
           config.beforeRequestCallback(config);
           return config;
@@ -72,42 +78,50 @@ class PureHttp {
           PureHttp.initConfig.beforeRequestCallback(config);
           return config;
         }
-        /** 請求白名單，放置一些不需要`token`的接口（通過設置請求白名單，防止`token`過期後再請求造成的死循環問題） */
-        const whiteList = ["/refresh-token", "/login"];
-        return whiteList.some(url => config.url.endsWith(url))
-          ? config
-          : new Promise(resolve => {
-              const data = getToken();
-              if (data) {
-                const now = new Date().getTime();
-                const expired = parseInt(data.expires) - now <= 0;
-                if (expired) {
-                  if (!PureHttp.isRefreshing) {
-                    PureHttp.isRefreshing = true;
-                    // token过期刷新
-                    useUserStoreHook()
-                      .handRefreshToken({ refreshToken: data.refreshToken })
-                      .then(res => {
-                        const token = res.data.accessToken;
-                        config.headers["Authorization"] = formatToken(token);
-                        PureHttp.requests.forEach(cb => cb(token));
-                        PureHttp.requests = [];
-                      })
-                      .finally(() => {
-                        PureHttp.isRefreshing = false;
-                      });
-                  }
-                  resolve(PureHttp.retryOriginalRequest(config));
-                } else {
-                  config.headers["Authorization"] = formatToken(
-                    data.accessToken
-                  );
-                  resolve(config);
-                }
-              } else {
-                resolve(config);
-              }
+
+        // 白名單內的路徑不需要 token，直接放行
+        const whiteList = ["/refresh-token", "/login", "/auth/refresh"];
+        if (whiteList.some(url => config.url.endsWith(url))) {
+          return config;
+        }
+
+        // 沒有 token，直接放行
+        const tokenData = getToken();
+        if (!tokenData) return config;
+
+        // token 未過期，塞入 header 後放行
+        const expired = parseInt(tokenData.expires) - new Date().getTime() <= 0;
+        if (!expired) {
+          config.headers["Authorization"] = formatToken(tokenData.accessToken);
+          return config;
+        }
+
+        // token 過期，發起 refresh
+        if (!PureHttp.isRefreshing) {
+          PureHttp.isRefreshing = true;
+          useUserStoreHook()
+            .handRefreshToken({ refreshToken: tokenData.refreshToken })
+            .then(res => {
+              const token = res.data.accessToken;
+              config.headers["Authorization"] = formatToken(token);
+              PureHttp.requests.forEach(({ resolve }) => resolve(token));
+              PureHttp.requests = [];
+            })
+            .catch(() => {
+              // Refresh 失敗，清除所有等待中的請求並登出
+              PureHttp.requests.forEach(({ reject }) =>
+                reject(new Error("Token 過期，請重新登入"))
+              );
+              PureHttp.requests = [];
+              useUserStoreHook().logOut();
+            })
+            .finally(() => {
+              PureHttp.isRefreshing = false;
             });
+        }
+
+        // 排隊等待 refresh 完成後重試
+        return PureHttp.retryOriginalRequest(config);
       },
       error => {
         return Promise.reject(error);
