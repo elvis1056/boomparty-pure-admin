@@ -7,7 +7,7 @@ import {
   routerArrays,
   storageLocal
 } from "../utils";
-import { type UserResult, getLogin, refreshTokenApi } from "@/api/user";
+import { getLogin, refreshTokenApi } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
 
@@ -59,17 +59,12 @@ export const useUserStore = defineStore("pure-user", {
       this.loginDay = Number(value);
     },
     /** 登入 */
-    async loginByUsername(data) {
-      return new Promise<UserResult>((resolve, reject) => {
-        getLogin(data)
-          .then(data => {
-            if (data?.success) setToken(data.data);
-            resolve(data);
-          })
-          .catch(error => {
-            reject(error);
-          });
-      });
+    async loginByUsername(requestPayload) {
+      const loginResult = await getLogin(requestPayload);
+      if (loginResult?.success) {
+        setToken(loginResult.data);
+      }
+      return loginResult;
     },
     /** 前端登出（不調用接口） */
     logOut() {
