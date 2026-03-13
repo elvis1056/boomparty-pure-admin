@@ -22,6 +22,7 @@ Vue 3 + Vite + Element Plus 後台管理介面，串接 boomparty Java Spring Bo
 - **READ FILES FIRST** before editing - Edit/Write tools will fail if you didn't read the file first
 - **SEARCH BEFORE CREATING** - Use Grep/Glob to find existing code before creating new files
 - **PLAN FIRST, ASK BEFORE ACTING** - 做事情之前都先計畫然後問使用者再動作
+- **WAIT FOR EXPLICIT GO-AHEAD** - 計畫通過後，必須等使用者明確說「開始」才能動手，禁止計畫一通過就直接執行
 
 ---
 
