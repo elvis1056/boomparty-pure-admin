@@ -313,3 +313,33 @@ sudo docker exec boomparty-admin chmod -R 755 /usr/share/nginx/html
 ```dockerfile
 RUN chmod -R 755 /usr/share/nginx/html
 ```
+
+---
+
+### PostgreSQL 使用者管理
+
+以下指令在 NAS 上透過 SSH 執行。
+
+**查詢所有使用者**：
+
+```bash
+sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "SELECT id, username, role FROM users;"
+```
+
+**產生 BCrypt hash**（macOS）：
+
+```bash
+htpasswd -bnBC 10 "" <your-password> | tr -d ":\n" | sed 's/$2y/$2a/'
+```
+
+**新增使用者**：
+
+```bash
+sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "INSERT INTO users (username, email, password, full_name, phone_number, role, enabled, created_at, updated_at) VALUES ('<username>', '<email>', '<bcrypt-hash>', '<full-name>', '<phone>', 'ADMIN', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);"
+```
+
+**更新 role**：
+
+```bash
+sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "UPDATE users SET role = 'ADMIN' WHERE username = '<username>';"
+```
