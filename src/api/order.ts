@@ -35,6 +35,9 @@ export type Order = {
   postalCode: string;
   addressLine: string;
   note: string | null;
+  couponCode: string | null;
+  discountAmount: number;
+  affiliateReferralCode: string | null;
   paymentMethod: PaymentMethodValue;
   paidAt: string | null;
   shippedAt: string | null;
@@ -64,17 +67,17 @@ export const PAYMENT_METHOD: Record<PaymentMethodValue, string> = {
 
 /** 取得所有訂單（管理員） */
 export const getAllOrders = () => {
-  return http.request<Order[]>("get", "/api/orders/admin/all");
+  return http.request<Order[]>("get", "/api/admin/orders");
 };
 
 /** 取得單一訂單詳情（管理員） */
 export const getOrderDetail = (id: number) => {
-  return http.request<Order>("get", `/api/orders/admin/${id}`);
+  return http.request<Order>("get", `/api/admin/orders/${id}`);
 };
 
 /** 更新訂單狀態（管理員） */
 export const updateOrderStatus = (id: number, status: OrderStatusValue) => {
-  return http.request<Order>("patch", `/api/orders/admin/${id}/status`, {
+  return http.request<Order>("patch", `/api/admin/orders/${id}/status`, {
     params: { status }
   });
 };
