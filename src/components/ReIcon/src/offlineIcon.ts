@@ -11,6 +11,8 @@ import EpTickets from "~icons/ep/tickets?raw";
 // https://icon-sets.iconify.design/ri/?keyword=ri
 import RiSearchLine from "~icons/ri/search-line?raw";
 import RiInformationLine from "~icons/ri/information-line?raw";
+import RiUserStarLine from "~icons/ri/user-star-line?raw";
+import RiCoupon3Line from "~icons/ri/coupon-3-line?raw";
 
 const icons = [
   // Element Plus Icon: https://github.com/element-plus/element-plus-icons
@@ -20,7 +22,9 @@ const icons = [
   ["ep/tickets", EpTickets],
   // Remix Icon: https://github.com/Remix-Design/RemixIcon
   ["ri/search-line", RiSearchLine],
-  ["ri/information-line", RiInformationLine]
+  ["ri/information-line", RiInformationLine],
+  ["ri/user-star-line", RiUserStarLine],
+  ["ri/coupon-3-line", RiCoupon3Line]
 ];
 
 // 本地選單圖標，後端在路由的 icon 中返回對應的圖標字符串並且前端在此處使用 addIcon 添加即可渲染選單圖標
