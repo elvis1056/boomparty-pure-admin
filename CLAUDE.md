@@ -36,6 +36,7 @@ Vue 3 + Vite + Element Plus 後台管理介面，串接 boomparty Java Spring Bo
 | `src/components/`     | 全域可重用元件                     | 純 UI，無業務邏輯         |
 | `src/store/modules/`  | Pinia 狀態管理                     | 全局狀態（如 auth、user） |
 | `src/utils/`          | 工具函式（http、auth、format 等）  | 純函式，不含 UI           |
+| `src/hooks/`          | 自訂 Composables                   | 命名以 `use` 開頭         |
 | `src/types/`          | TypeScript 型別定義                | 集中管理                  |
 
 ### 路由模組規範
@@ -94,6 +95,77 @@ Vue 3 + Vite + Element Plus 後台管理介面，串接 boomparty Java Spring Bo
 
    // ✅ 正確
    const value = data !== null && data !== undefined ? data : defaultValue;
+   ```
+
+5. **Props 定義**
+
+   ```vue
+   <script setup lang="ts">
+   interface Props {
+     title: string;
+     count?: number;
+     disabled?: boolean;
+   }
+
+   const props = withDefaults(defineProps<Props>(), {
+     count: 0,
+     disabled: false
+   });
+   </script>
+   ```
+
+6. **Emits 定義**
+
+   ```vue
+   <script setup lang="ts">
+   interface Emits {
+     (e: "update", value: string): void;
+     (e: "delete", id: number): void;
+   }
+
+   const emit = defineEmits<Emits>();
+   </script>
+   ```
+
+7. **Composables 命名：以 `use` 開頭，放在 `src/hooks/`**
+
+   ```typescript
+   // src/hooks/useTable.ts
+   export function useTable() { ... }
+
+   // src/hooks/useAuth.ts
+   export function useAuth() { ... }
+   ```
+
+8. **禁止 `v-if` 和 `v-for` 同層使用，改用 `computed` 過濾**
+
+   ```vue
+   <!-- ❌ 錯誤 -->
+   <div v-for="user in users" v-if="user.active" :key="user.id">
+
+   <!-- ✅ 正確 -->
+   <script setup lang="ts">
+   const activeUsers = computed(() => users.value.filter(u => u.active));
+   </script>
+   <template>
+     <div v-for="user in activeUsers" :key="user.id">
+   </template>
+   ```
+
+### TypeScript 規範
+
+1. **Interface 命名慣例**
+
+   ```typescript
+   interface UserListProps {} // Props 加後綴
+   interface User {} // 資料模型，不加後綴
+   interface UserState {} // Store 狀態加後綴
+   ```
+
+2. **未使用參數加底線前綴**
+
+   ```typescript
+   function Component({ used, _unused }: Props) {}
    ```
 
 ### API 模組規範
