@@ -47,19 +47,12 @@ export const deleteCategory = (id: number) => {
 
 /** 設定分類封面圖 */
 export const setCategoryCoverImage = (id: number, mediaAssetId: number) => {
-  return http.request<void>(
-    "patch",
-    `/api/admin/categories/${id}/cover-image`,
-    {
-      data: { mediaAssetId }
-    }
-  );
+  return http.request<void>("patch", `/api/categories/${id}/cover-image`, {
+    params: { mediaAssetId }
+  });
 };
 
 /** 移除分類封面圖 */
 export const removeCategoryCoverImage = (id: number) => {
-  return http.request<void>(
-    "delete",
-    `/api/admin/categories/${id}/cover-image`
-  );
+  return http.request<void>("delete", `/api/categories/${id}/cover-image`);
 };
