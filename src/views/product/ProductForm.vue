@@ -1,8 +1,20 @@
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
+import { ElMessage } from "element-plus";
 import { getCategories, type Category } from "@/api/category";
-import type { Product, ProductForm } from "@/api/product";
+import {
+  addProductImage,
+  removeProductImage,
+  setProductPrimaryImage,
+  reorderProductImages,
+  type Product,
+  type ProductForm,
+  type ProductImage
+} from "@/api/product";
+import type { MediaAsset } from "@/api/media";
+import draggable from "vuedraggable";
+import MediaPickerDialog from "@/components/MediaPickerDialog.vue";
 
 const props = defineProps<{
   mode: "create" | "edit";
@@ -34,6 +46,29 @@ const rules: FormRules = {
   stock: [{ required: true, message: "請輸入庫存", trigger: "blur" }]
 };
 
+// 多圖狀態
+const images = ref<ProductImage[]>([]);
+const pickerVisible = ref(false);
+const pickerValue = ref<MediaAsset | null>(null);
+
+const openPicker = () => {
+  pickerVisible.value = true;
+};
+
+// 監聽 picker 選完後新增圖片
+watch(pickerValue, async media => {
+  if (!media || !props.initialData) return;
+  try {
+    const added = await addProductImage(props.initialData.id, media.id);
+    images.value.push(added);
+    pickerValue.value = null;
+    ElMessage.success("已新增圖片");
+  } catch {
+    ElMessage.error("新增圖片失敗");
+    pickerValue.value = null;
+  }
+});
+
 // 編輯模式時將初始資料填入表單
 watch(
   () => props.initialData,
@@ -47,6 +82,7 @@ watch(
       form.active = data.active;
       form.featured = data.featured;
       form.categoryId = data.categoryId;
+      images.value = data.images ? [...data.images] : [];
     }
   },
   { immediate: true }
@@ -66,6 +102,44 @@ const submitForm = async () => {
   });
 };
 
+const setPrimary = async (image: ProductImage) => {
+  if (!props.initialData) return;
+  try {
+    await setProductPrimaryImage(props.initialData.id, image.id);
+    images.value = images.value.map(img => ({
+      ...img,
+      isPrimary: img.id === image.id
+    }));
+    ElMessage.success("已設為主圖");
+  } catch {
+    ElMessage.error("設定失敗");
+  }
+};
+
+const removeImage = async (image: ProductImage) => {
+  if (!props.initialData) return;
+  try {
+    await removeProductImage(props.initialData.id, image.id);
+    images.value = images.value.filter(img => img.id !== image.id);
+    ElMessage.success("已移除");
+  } catch {
+    ElMessage.error("移除失敗");
+  }
+};
+
+const onDragEnd = async () => {
+  if (!props.initialData) return;
+  const orders = images.value.map((img, idx) => ({
+    imageId: img.id,
+    sortOrder: idx
+  }));
+  try {
+    await reorderProductImages(props.initialData.id, orders);
+  } catch {
+    ElMessage.error("排序儲存失敗");
+  }
+};
+
 onMounted(fetchCategories);
 </script>
 
@@ -75,7 +149,7 @@ onMounted(fetchCategories);
     :model="form"
     :rules="rules"
     label-width="100px"
-    style="max-width: 640px"
+    style="max-width: 680px"
   >
     <el-form-item label="商品名稱" prop="name">
       <el-input v-model="form.name" placeholder="請輸入商品名稱" />
@@ -98,18 +172,74 @@ onMounted(fetchCategories);
       <el-input-number v-model="form.stock" :min="0" :precision="0" />
     </el-form-item>
 
-    <el-form-item label="圖片網址">
-      <el-input v-model="form.imageUrl" placeholder="https://..." />
-      <img
-        v-if="form.imageUrl"
-        :src="form.imageUrl"
-        style="
-          max-width: 200px;
-          max-height: 200px;
-          margin-top: 8px;
-          object-fit: cover;
-        "
-      />
+    <!-- 商品圖片（多圖管理） -->
+    <el-form-item label="商品圖片">
+      <div class="w-full">
+        <!-- 拖曳排序圖片列表 -->
+        <draggable
+          v-model="images"
+          item-key="id"
+          class="mb-2 flex flex-wrap gap-2"
+          handle=".drag-handle"
+          @end="onDragEnd"
+        >
+          <template #item="{ element: img }">
+            <div
+              class="relative overflow-hidden rounded border"
+              :class="img.isPrimary ? 'border-blue-500' : 'border-gray-200'"
+              style="width: 100px"
+            >
+              <!-- 拖曳把手 -->
+              <div
+                class="drag-handle absolute left-0 top-0 flex h-6 w-full cursor-grab items-center justify-center bg-black/20 text-white"
+              >
+                <el-icon size="12"><i-ep-d-caret /></el-icon>
+              </div>
+              <img
+                :src="img.url"
+                :alt="img.altText !== null ? img.altText : ''"
+                class="aspect-square w-full object-cover"
+              />
+              <!-- 主圖標 -->
+              <div
+                v-if="img.isPrimary"
+                class="absolute bottom-0 left-0 w-full bg-blue-500 py-0.5 text-center text-xs text-white"
+              >
+                主圖
+              </div>
+              <!-- 操作按鈕 -->
+              <div class="flex gap-1 p-1">
+                <el-button
+                  v-if="!img.isPrimary"
+                  size="small"
+                  type="primary"
+                  plain
+                  class="flex-1 !px-0 text-xs"
+                  @click="setPrimary(img)"
+                >
+                  設主圖
+                </el-button>
+                <el-button
+                  size="small"
+                  type="danger"
+                  plain
+                  class="!px-1"
+                  @click="removeImage(img)"
+                >
+                  <el-icon><i-ep-delete /></el-icon>
+                </el-button>
+              </div>
+            </div>
+          </template>
+        </draggable>
+
+        <!-- 新增圖片按鈕（僅編輯模式可用） -->
+        <div v-if="mode === 'edit'">
+          <el-button size="small" @click="openPicker">+ 新增圖片</el-button>
+          <span class="ml-2 text-xs text-gray-400">拖曳圖片可調整排序</span>
+        </div>
+        <div v-else class="text-xs text-gray-400">儲存商品後可新增圖片</div>
+      </div>
     </el-form-item>
 
     <el-form-item label="分類">
@@ -149,4 +279,7 @@ onMounted(fetchCategories);
       <el-button @click="emit('cancel')">取消</el-button>
     </el-form-item>
   </el-form>
+
+  <!-- 圖片選擇 Dialog -->
+  <MediaPickerDialog v-model="pickerValue" v-model:visible="pickerVisible" />
 </template>

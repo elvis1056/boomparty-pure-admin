@@ -1,24 +1,46 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
-import { ElMessage } from "element-plus";
+import { ref, computed, watch } from "vue";
+import { ElMessage, type UploadFile } from "element-plus";
 import { getMediaList, uploadMedia, type MediaAsset } from "@/api/media";
 
 interface Props {
   modelValue: MediaAsset | MediaAsset[] | null;
+  visible?: boolean;
   multiple?: boolean;
 }
 
 interface Emits {
   (e: "update:modelValue", value: MediaAsset | MediaAsset[] | null): void;
+  (e: "update:visible", value: boolean): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  visible: false,
   multiple: false
 });
 
 const emit = defineEmits<Emits>();
 
-const visible = ref(false);
+const internalVisible = ref(false);
+
+// 同步外部 visible → 內部，並在開啟時初始化
+watch(
+  () => props.visible,
+  val => {
+    if (val) {
+      initSelection();
+      internalVisible.value = true;
+      if (mediaList.value.length === 0) fetchMedia();
+    } else {
+      internalVisible.value = false;
+    }
+  }
+);
+
+// 內部關閉時通知父層
+watch(internalVisible, val => {
+  if (!val) emit("update:visible", false);
+});
 const loading = ref(false);
 const mediaList = ref<MediaAsset[]>([]);
 const searchText = ref("");
@@ -37,8 +59,7 @@ const filteredList = computed(() => {
   );
 });
 
-const open = () => {
-  // 同步初始選中狀態
+const initSelection = () => {
   selectedIds.value = new Set();
   if (props.modelValue) {
     if (Array.isArray(props.modelValue)) {
@@ -47,8 +68,6 @@ const open = () => {
       selectedIds.value.add(props.modelValue.id);
     }
   }
-  visible.value = true;
-  if (mediaList.value.length === 0) fetchMedia();
 };
 
 const fetchMedia = async () => {
@@ -85,11 +104,12 @@ const confirmSelection = () => {
     const selected = mediaList.value.find(m => selectedIds.value.has(m.id));
     emit("update:modelValue", selected !== undefined ? selected : null);
   }
-  visible.value = false;
+  internalVisible.value = false;
 };
 
 // 上傳並加入選中
-const onFileChange = async (file: { raw: File }) => {
+const onFileChange = async (file: UploadFile) => {
+  if (!file.raw) return;
   try {
     const result = await uploadMedia(file.raw);
     mediaList.value.unshift(result);
@@ -103,16 +123,15 @@ const onFileChange = async (file: { raw: File }) => {
     ElMessage.error("上傳失敗");
   }
 };
-
-defineExpose({ open });
 </script>
 
 <template>
   <el-dialog
-    v-model="visible"
+    v-model="internalVisible"
     title="選擇圖片"
     width="860px"
     :destroy-on-close="false"
+    append-to-body
   >
     <!-- 搜尋列 + 上傳 -->
     <div class="mb-4 flex items-center gap-3">
@@ -121,7 +140,6 @@ defineExpose({ open });
         placeholder="搜尋圖片名稱或 alt text"
         clearable
         style="flex: 1"
-        prefix-icon="ep/search"
       />
       <el-upload
         :auto-upload="false"
@@ -162,9 +180,9 @@ defineExpose({ open });
           <!-- 勾選標記 -->
           <div
             v-if="selectedIds.has(media.id)"
-            class="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-blue-500 text-white"
+            class="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold"
           >
-            <el-icon size="12"><i-ep-check /></el-icon>
+            ✓
           </div>
           <div class="truncate px-1 py-0.5 text-xs text-gray-500">
             {{
@@ -187,7 +205,7 @@ defineExpose({ open });
           }}
         </span>
         <div class="flex gap-2">
-          <el-button @click="visible = false">取消</el-button>
+          <el-button @click="internalVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmSelection">確定</el-button>
         </div>
       </div>
