@@ -10,6 +10,7 @@ export type Category = {
   active: boolean;
   productCount: number;
   isTopLevel?: boolean;
+  coverImageUrl: string | null;
 };
 
 export type CategoryForm = {
@@ -42,4 +43,23 @@ export const updateCategory = (id: number, data: CategoryForm) => {
 /** 刪除分類 */
 export const deleteCategory = (id: number) => {
   return http.request<void>("delete", `/api/categories/${id}`);
+};
+
+/** 設定分類封面圖 */
+export const setCategoryCoverImage = (id: number, mediaAssetId: number) => {
+  return http.request<void>(
+    "patch",
+    `/api/admin/categories/${id}/cover-image`,
+    {
+      data: { mediaAssetId }
+    }
+  );
+};
+
+/** 移除分類封面圖 */
+export const removeCategoryCoverImage = (id: number) => {
+  return http.request<void>(
+    "delete",
+    `/api/admin/categories/${id}/cover-image`
+  );
 };
