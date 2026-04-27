@@ -15,7 +15,6 @@ export type Product = {
   description: string;
   price: number;
   stock: number;
-  imageUrl: string;
   active: boolean;
   featured: boolean;
   categoryId: number | null;
@@ -30,7 +29,6 @@ export type ProductForm = {
   description: string;
   price: number;
   stock: number;
-  imageUrl: string;
   active: boolean;
   featured: boolean;
   categoryId: number | null;

@@ -1,10 +1,46 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { getProducts, deleteProduct, type Product } from "@/api/product";
+import { getCategories, type Category } from "@/api/category";
 
 const loading = ref(false);
 const products = ref<Product[]>([]);
+const categories = ref<Category[]>([]);
+const selectedCategoryId = ref<number | null>(null);
+
+const getSubCategoryIds = (parentCategoryId: number): number[] => {
+  return categories.value
+    .filter(category => category.parentId === parentCategoryId)
+    .map(category => category.id);
+};
+
+const filteredProducts = computed(() => {
+  if (selectedCategoryId.value === null) {
+    return products.value;
+  }
+  const selectedCategory = categories.value.find(
+    category => category.id === selectedCategoryId.value
+  );
+  if (!selectedCategory) {
+    return products.value;
+  }
+  if (selectedCategory.parentId === null) {
+    const subCategoryIds = getSubCategoryIds(selectedCategory.id);
+    return products.value.filter(
+      product =>
+        product.categoryId !== null &&
+        subCategoryIds.includes(product.categoryId)
+    );
+  }
+  return products.value.filter(
+    product => product.categoryId === selectedCategoryId.value
+  );
+});
+
+const topLevelCategories = computed(() =>
+  categories.value.filter(category => category.parentId === null)
+);
 
 const fetchProducts = async () => {
   loading.value = true;
@@ -15,6 +51,15 @@ const fetchProducts = async () => {
     ElMessage.error("載入商品失敗");
   } finally {
     loading.value = false;
+  }
+};
+
+const fetchCategories = async () => {
+  try {
+    const data = await getCategories();
+    categories.value = Array.isArray(data) ? data : [];
+  } catch {
+    ElMessage.error("載入分類失敗");
   }
 };
 
@@ -33,7 +78,10 @@ const removeProduct = async (id: number, name: string) => {
   }
 };
 
-onMounted(fetchProducts);
+onMounted(() => {
+  fetchProducts();
+  fetchCategories();
+});
 </script>
 
 <template>
@@ -45,7 +93,37 @@ onMounted(fetchProducts);
       </el-button>
     </div>
 
-    <el-table v-loading="loading" :data="products" border stripe>
+    <div class="mb-4">
+      <el-select
+        v-model="selectedCategoryId"
+        placeholder="篩選分類"
+        clearable
+        style="width: 220px"
+        @clear="selectedCategoryId = null"
+      >
+        <el-option :value="null" label="全部" />
+        <template
+          v-for="parentCategory in topLevelCategories"
+          :key="parentCategory.id"
+        >
+          <el-option
+            :value="parentCategory.id"
+            :label="parentCategory.name"
+            disabled
+          />
+          <el-option
+            v-for="subCategory in categories.filter(
+              category => category.parentId === parentCategory.id
+            )"
+            :key="subCategory.id"
+            :value="subCategory.id"
+            :label="`　${subCategory.name}`"
+          />
+        </template>
+      </el-select>
+    </div>
+
+    <el-table v-loading="loading" :data="filteredProducts" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="name" label="商品名稱" min-width="160" />
       <el-table-column prop="price" label="價格" width="100">
