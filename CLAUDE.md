@@ -4,28 +4,6 @@ Vue 3 + Vite + Element Plus 後台管理介面，串接 boomparty Java Spring Bo
 
 ---
 
-## 🚨 CRITICAL RULES - READ FIRST
-
-### ❌ ABSOLUTE PROHIBITIONS
-
-- **NEVER** create new files in root directory → use proper module structure
-- **NEVER** create documentation files (.md) unless explicitly requested by user
-- **NEVER** use git commands with -i flag (interactive mode not supported)
-- **NEVER** use `find`, `grep`, `cat`, `head`, `tail`, `ls` commands → use Read, Grep, Glob tools instead
-- **NEVER** create duplicate files (manager_v2.ts, enhanced_xyz.ts) → ALWAYS extend existing files
-- **NEVER** hardcode values that should be configurable → use env vars or config files
-- **NEVER** use naming like enhanced\*, improved\*, new\*, v2\* → extend original files instead
-- **NEVER** add Co-Authored-By to commit messages
-
-### 📝 MANDATORY REQUIREMENTS
-
-- **READ FILES FIRST** before editing - Edit/Write tools will fail if you didn't read the file first
-- **SEARCH BEFORE CREATING** - Use Grep/Glob to find existing code before creating new files
-- **PLAN FIRST, ASK BEFORE ACTING** - 做事情之前都先計畫然後問使用者再動作
-- **WAIT FOR EXPLICIT GO-AHEAD** - 計畫通過後，必須等使用者明確說「開始」才能動手，禁止計畫一通過就直接執行
-
----
-
 ## 資料夾結構
 
 | 資料夾                | 用途                               | 注意事項                  |
@@ -47,141 +25,22 @@ Vue 3 + Vite + Element Plus 後台管理介面，串接 boomparty Java Spring Bo
 
 ---
 
-## 程式碼規範
+## 環境設定
 
-### Vue 3 Composition API
+| 環境 | VITE_API_BASE_URL          | API 路由方式                         |
+| ---- | -------------------------- | ------------------------------------ |
+| 開發 | `""`（空字串）             | Vite proxy `/api` → `localhost:8080` |
+| 生產 | `https://api.boomparty.tw` | 直接打 NAS API                       |
 
-1. **使用 `<script setup>` 語法**
+---
 
-   ```vue
-   <!-- ✅ 正確 -->
-   <script setup lang="ts">
-   import { ref, onMounted } from "vue";
-   </script>
-
-   <!-- ❌ 錯誤：不使用 Options API -->
-   <script>
-   export default { data() {} };
-   </script>
-   ```
-
-2. **響應式資料**
-
-   ```typescript
-   // ✅ 基本值用 ref，物件/陣列用 reactive
-   const loading = ref(false);
-   const list = ref<Product[]>([]);
-   const form = reactive({ name: "", price: 0 });
-   ```
-
-3. **❌ 函式命名：禁止使用 handle 前綴**
-
-   ```typescript
-   // ❌ 錯誤：看不出在做什麼
-   const handleSubmit = () => {};
-   const handleDelete = id => {};
-
-   // ✅ 正確：直接用動作命名
-   const submitForm = () => {};
-   const deleteProduct = id => {};
-   const fetchProducts = async () => {};
-   ```
-
-4. **不使用 nullish coalescing（??），用三元運算子**
-
-   ```typescript
-   // ❌ 錯誤
-   const value = data ?? defaultValue;
-
-   // ✅ 正確
-   const value = data !== null && data !== undefined ? data : defaultValue;
-   ```
-
-5. **Props 定義**
-
-   ```vue
-   <script setup lang="ts">
-   interface Props {
-     title: string;
-     count?: number;
-     disabled?: boolean;
-   }
-
-   const props = withDefaults(defineProps<Props>(), {
-     count: 0,
-     disabled: false
-   });
-   </script>
-   ```
-
-6. **Emits 定義**
-
-   ```vue
-   <script setup lang="ts">
-   interface Emits {
-     (e: "update", value: string): void;
-     (e: "delete", id: number): void;
-   }
-
-   const emit = defineEmits<Emits>();
-   </script>
-   ```
-
-7. **Composables 命名：以 `use` 開頭，放在 `src/hooks/`**
-
-   ```typescript
-   // src/hooks/useTable.ts
-   export function useTable() { ... }
-
-   // src/hooks/useAuth.ts
-   export function useAuth() { ... }
-   ```
-
-8. **禁止 `v-if` 和 `v-for` 同層使用，改用 `computed` 過濾**
-
-   ```vue
-   <!-- ❌ 錯誤 -->
-   <div v-for="user in users" v-if="user.active" :key="user.id">
-
-   <!-- ✅ 正確 -->
-   <script setup lang="ts">
-   const activeUsers = computed(() => users.value.filter(u => u.active));
-   </script>
-   <template>
-     <div v-for="user in activeUsers" :key="user.id">
-   </template>
-   ```
-
-### TypeScript 規範
-
-1. **Interface 命名慣例**
-
-   ```typescript
-   interface UserListProps {} // Props 加後綴
-   interface User {} // 資料模型，不加後綴
-   interface UserState {} // Store 狀態加後綴
-   ```
-
-2. **未使用參數加底線前綴**
-
-   ```typescript
-   function Component({ used, _unused }: Props) {}
-   ```
-
-### API 模組規範
+## API 模組規範
 
 每個業務模組對應一個 API 檔案，放在 `src/api/`：
 
 ```typescript
 // src/api/product.ts
 import { http } from "@/utils/http";
-
-export type Product = {
-  id: number;
-  name: string;
-  price: number;
-  // ...
-};
 
 export const getProducts = () =>
   http.request<Product[]>("get", "/api/products");
@@ -195,47 +54,9 @@ export const deleteProduct = (id: number) =>
   http.request<void>("delete", `/api/products/${id}`);
 ```
 
-### 樣式規範
+---
 
-1. **使用 `<style scoped>`**，避免污染全域
-
-   ```vue
-   <style scoped>
-   .product-list {
-     padding: 16px;
-   }
-   </style>
-   ```
-
-2. **優先使用 Element Plus 元件與屬性**，減少自訂樣式
-
-3. **禁止 inline style**（非必要情況）
-
-   ```vue
-   <!-- ❌ 錯誤 -->
-   <div style="margin-top: 16px"></div>
-   ```
-
-### 字串常數化
-
-避免 magic string：
-
-```typescript
-// ❌ 錯誤
-if (status === "active") {
-}
-
-// ✅ 正確
-export const PRODUCT_STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive"
-} as const;
-
-if (status === PRODUCT_STATUS.ACTIVE) {
-}
-```
-
-### Import 順序
+## Import 順序
 
 ```typescript
 // 1. Vue 核心
@@ -253,185 +74,11 @@ import ProductForm from "./ProductForm.vue";
 
 ---
 
-## Commit 規範
+## 規則參考
 
-### Commit Message 格式
+詳細程式碼規範見 `.claude/rules/`：
 
-```
-<type>: <English short description>
+- `composition-api.md` — Vue 3 Composition API、命名規範、TypeScript、樣式
+- `nas-troubleshooting.md` — NAS 部署除錯、PostgreSQL 使用者管理
 
-English details:
-- point 1
-- point 2
-
-中文說明：
-- 點 1
-- 點 2
-
-【Revert 說明】
-📦 依賴項：<列出此 commit 依賴的其他 commit 或「無」>
-✅ 獨立 revert：<說明是否可以單獨 revert>
-🔧 影響功能：<列出會受影響的功能>
-```
-
-**語言規範**：
-
-- 第一行（標題）：**英文**
-- Body 先寫英文說明，再附上中文翻譯
-- 標題和 body 中間空一行
-
-**❌ 重要：不要添加 Co-Authored-By**
-
-### Type 類型
-
-| Type     | 說明                   |
-| -------- | ---------------------- |
-| feat     | 新功能                 |
-| fix      | 修正錯誤               |
-| perf     | 效能優化               |
-| refactor | 重構（不改變功能）     |
-| style    | 樣式調整（不影響邏輯） |
-| docs     | 文件更新               |
-| chore    | 建構工具、依賴更新     |
-
-### 切分 Commit 原則
-
-**✅ 好的切分**：
-
-- 每個 commit 完成一個完整的小功能
-- 可以單獨 revert 而不影響其他功能
-- 相關的檔案放在同一個 commit
-- 先 commit 被依賴的，後 commit 依賴的
-
-**❌ 避免**：
-
-- 太大的 commit（難以 revert）
-- 混合不相關的改動
-
-### Commit 前檢查清單
-
-- [ ] Commit message 包含 type
-- [ ] 標題簡短清楚（<50 字）
-- [ ] 包含完整的 Revert 說明
-- [ ] 執行 `pnpm lint` 確認無錯誤
-- [ ] 可以獨立編譯/運行
-
----
-
-## 環境設定
-
-| 環境 | VITE_API_BASE_URL          | API 路由方式                         |
-| ---- | -------------------------- | ------------------------------------ |
-| 開發 | `""`（空字串）             | Vite proxy `/api` → `localhost:8080` |
-| 生產 | `https://api.boomparty.tw` | 直接打 NAS API                       |
-
----
-
-## 核心原則
-
-- ✅ 搜尋後再建立，避免重複
-- ✅ Edit 前先 Read
-- ✅ 完成功能後立即 Lint，Lint 後再 commit
-- ✅ 做事情之前先計畫，問完使用者再動作
-
----
-
-## Checkpoint 規則
-
-任何 agent 在以下情況必須主動更新 `HANDOFF.md`，不等使用者提醒：
-
-**觸發時機：**
-
-- Context 使用量達到 60%（不等 95% auto-compact）
-- 完成一個完整功能或重要決策後
-- 要做大操作之前（重構、多檔案修改、刪除）
-- 對話超過 20–30 個來回 → 提醒使用者開新對話
-
-**要更新的內容：**
-
-- `HANDOFF.md` 頂部的「更新日期」
-- 「進行中計畫」的當前狀態與卡住原因
-- 把完成的項目移入「已完成」
-
----
-
-## NAS 部署 Troubleshooting
-
-### macOS `._*` AppleDouble 檔案導致 Docker build 失敗
-
-**症狀**：`pnpm build` 在 Docker 內失敗，錯誤訊息類似：
-
-```
-Utf8Error { valid_up_to: 45, error_len: Some(1) }
-```
-
-Tailwind v4 oxide（Rust 引擎）掃描到 `._*.vue` 等 binary 檔案，無法解析 UTF-8 而 panic。
-
-**原因**：macOS 用 zip/tar 打包時會產生 `._*` companion 檔案（AppleDouble 格式），解壓縮到 NAS 後殘留在 `src/` 目錄。
-
-**確認數量**：
-
-```bash
-sudo find /var/services/homes/nasweb/boomparty-pure-admin -name "._*" | wc -l
-```
-
-**清除指令**：
-
-```bash
-sudo find /var/services/homes/nasweb/boomparty-pure-admin -name "._*" -delete
-```
-
-**預防措施**（已設定）：
-
-- `.dockerignore` 已加入 `._*` — Docker build context 不含這些檔案
-- 打包時用 `COPYFILE_DISABLE=1 tar czf ...` 可避免產生 `._*`
-
----
-
-### nginx 403 Permission Denied
-
-**症狀**：admin.boomparty.tw 出現 403 Forbidden，NAS log 顯示 `Permission denied (13)`
-
-**原因**：Docker COPY 複製的靜態檔案權限為 `rwx--x--x`（711），nginx worker（非 root）無法讀取。
-
-**臨時修復**（不重 build）：
-
-```bash
-sudo docker exec boomparty-admin chmod -R 755 /usr/share/nginx/html
-```
-
-**永久修復**（已寫入 Dockerfile）：
-
-```dockerfile
-RUN chmod -R 755 /usr/share/nginx/html
-```
-
----
-
-### PostgreSQL 使用者管理
-
-以下指令在 NAS 上透過 SSH 執行。
-
-**查詢所有使用者**：
-
-```bash
-sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "SELECT id, username, role FROM users;"
-```
-
-**產生 BCrypt hash**（macOS）：
-
-```bash
-htpasswd -bnBC 10 "" <your-password> | tr -d ":\n" | sed 's/$2y/$2a/'
-```
-
-**新增使用者**：
-
-```bash
-sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "INSERT INTO users (username, email, password, full_name, phone_number, role, enabled, created_at, updated_at) VALUES ('<username>', '<email>', '<bcrypt-hash>', '<full-name>', '<phone>', 'ADMIN', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);"
-```
-
-**更新 role**：
-
-```bash
-sudo docker exec boomparty-postgres psql -U dbuser -d boomparty -c "UPDATE users SET role = 'ADMIN' WHERE username = '<username>';"
-```
+Commit 格式見 `~/.claude/rules/commit.md`。
