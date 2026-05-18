@@ -46,6 +46,21 @@ class PureHttp {
   /** 防止重複刷新`token` */
   private static isRefreshing = false;
 
+  /** State-changing HTTP methods that require CSRF token */
+  private static readonly CSRF_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
+
+  /** Read CSRF token from XSRF-TOKEN cookie set by Spring Security */
+  private static getCsrfTokenFromCookie(): string | null {
+    const cookies = document.cookie.split(";");
+    const csrfCookie = cookies.find(cookie =>
+      cookie.trim().startsWith("XSRF-TOKEN=")
+    );
+    if (!csrfCookie) {
+      return null;
+    }
+    return csrfCookie.split("=")[1];
+  }
+
   /** 初始化配置對象 */
   private static initConfig: PureHttpRequestConfig = {};
 
@@ -69,6 +84,16 @@ class PureHttp {
   private httpInterceptorsRequest(): void {
     PureHttp.axiosInstance.interceptors.request.use(
       async (config: PureHttpRequestConfig): Promise<any> => {
+        // Inject CSRF token for state-changing requests (POST, PUT, DELETE, PATCH)
+        if (
+          PureHttp.CSRF_METHODS.includes(config.method?.toUpperCase() ?? "")
+        ) {
+          const csrfToken = PureHttp.getCsrfTokenFromCookie();
+          if (csrfToken) {
+            config.headers["X-XSRF-TOKEN"] = csrfToken;
+          }
+        }
+
         // 優先判斷 post/get 等方法是否傳入回調，否則執行初始化設置等回調
         if (typeof config.beforeRequestCallback === "function") {
           config.beforeRequestCallback(config);
