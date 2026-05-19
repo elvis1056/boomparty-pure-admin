@@ -7,8 +7,8 @@ export interface DataInfo<T> {
   accessToken: string;
   /** `accessToken`的過期時間（時間戳） */
   expires: T;
-  /** 用於調用刷新accessToken的接口時所需的token */
-  refreshToken: string;
+  /** refreshToken 由後端 HttpOnly cookie 管理，前端不存取 */
+  refreshToken?: string;
   /** 頭像 */
   avatar?: string;
   /** 使用者名 */
@@ -41,16 +41,16 @@ export function getToken(): DataInfo<number> {
 
 /**
  * @description 設置`token`以及一些必要信息並採用無感刷新`token`方案
- * 無感刷新：後端返回`accessToken`（訪問接口使用的`token`）、`refreshToken`（用於調用刷新`accessToken`的接口時所需的`token`，`refreshToken`的過期時間（比如30天）應大於`accessToken`的過期時間（比如2小時））、`expires`（`accessToken`的過期時間）
- * 將`accessToken`、`expires`、`refreshToken`這三條信息放在key值為authorized-token的cookie里（過期自動銷毀）
- * 將`avatar`、`username`、`nickname`、`roles`、`permissions`、`refreshToken`、`expires`這七條訊息放在key值為`user-info`的localStorage裡（利用`multipleTabsKey`當瀏覽器完全關閉後自動銷毀）
+ * 無感刷新：後端返回`accessToken`和`expires`，`refreshToken`存於後端設定的 HttpOnly cookie（瀏覽器自動帶入，前端不可讀取）
+ * 將`accessToken`、`expires`放在key值為authorized-token的cookie里（過期自動銷毀）
+ * 將`avatar`、`username`、`nickname`、`roles`、`permissions`、`expires`這六條訊息放在key值為`user-info`的localStorage裡（利用`multipleTabsKey`當瀏覽器完全關閉後自動銷毀）
  */
 export function setToken(data: DataInfo<number>) {
   let expires = 0;
-  const { accessToken, refreshToken } = data;
+  const { accessToken } = data;
   const { isRemembered, loginDay } = useUserStoreHook();
   expires = data.expires; // 後端直接回傳 Unix timestamp（毫秒）
-  const cookieString = JSON.stringify({ accessToken, expires, refreshToken });
+  const cookieString = JSON.stringify({ accessToken, expires });
 
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
@@ -75,7 +75,6 @@ export function setToken(data: DataInfo<number>) {
     useUserStoreHook().SET_ROLES(roles);
     useUserStoreHook().SET_PERMS(permissions);
     storageLocal().setItem(userKey, {
-      refreshToken,
       expires,
       avatar,
       username,

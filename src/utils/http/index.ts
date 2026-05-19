@@ -125,7 +125,7 @@ class PureHttp {
         if (!PureHttp.isRefreshing) {
           PureHttp.isRefreshing = true;
           useUserStoreHook()
-            .handRefreshToken({ refreshToken: tokenData.refreshToken })
+            .handRefreshToken()
             .then(res => {
               const token = res.data.accessToken;
               config.headers["Authorization"] = formatToken(token);

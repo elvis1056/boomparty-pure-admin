@@ -77,8 +77,8 @@ export const useUserStore = defineStore("pure-user", {
       router.push("/login");
     },
     /** 刷新`token` */
-    async handRefreshToken(requestPayload) {
-      const apiResponse = await refreshTokenApi(requestPayload);
+    async handRefreshToken() {
+      const apiResponse = await refreshTokenApi();
       if (apiResponse) {
         setToken(apiResponse.data);
       }
