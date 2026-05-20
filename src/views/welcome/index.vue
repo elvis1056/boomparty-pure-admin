@@ -5,5 +5,5 @@ defineOptions({
 </script>
 
 <template>
-  <h1>Pure-Admin-Thin（非國際化版本）</h1>
+  <h1>BoomParty 後台管理</h1>
 </template>
