@@ -10,6 +10,7 @@ import {
   type Booking,
   type BookingStatusValue
 } from "@/api/booking";
+import BookingDetail from "./BookingDetail.vue";
 
 // ── State ───────────────────────────────────────────────────────
 
@@ -24,6 +25,19 @@ const dateRange = ref<[string, string] | null>(null);
 // Pagination
 const currentPage = ref(1);
 const pageSize = ref(15);
+
+// Drawer
+const drawerVisible = ref(false);
+const selectedBookingId = ref<number | null>(null);
+
+const openDetail = (booking: Booking) => {
+  selectedBookingId.value = booking.id;
+  drawerVisible.value = true;
+};
+
+const refreshAfterUpdate = async () => {
+  await fetchBookings();
+};
 
 // ── Data Fetching ───────────────────────────────────────────────
 
@@ -344,8 +358,10 @@ const sortByCreatedAt = (a: Booking, b: Booking): number => {
         </template>
       </el-table-column>
       <el-table-column label="操作" width="80" fixed="right">
-        <template #default>
-          <el-button size="small" type="primary"> 查看 </el-button>
+        <template #default="{ row }">
+          <el-button size="small" type="primary" @click="openDetail(row)">
+            查看
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -361,6 +377,21 @@ const sortByCreatedAt = (a: Booking, b: Booking): number => {
         background
       />
     </div>
+
+    <!-- Detail Drawer -->
+    <el-drawer
+      v-model="drawerVisible"
+      title="預約詳情"
+      direction="rtl"
+      size="680px"
+      destroy-on-close
+    >
+      <BookingDetail
+        v-if="selectedBookingId"
+        :booking-id="selectedBookingId"
+        @updated="refreshAfterUpdate"
+      />
+    </el-drawer>
   </div>
 </template>
 
