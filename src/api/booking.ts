@@ -92,6 +92,46 @@ export const BOOKING_PAYMENT_METHOD: Record<BookingPaymentMethodValue, string> =
     ONSITE: "現場付現"
   };
 
+// ── Sub-resource Types ──────────────────────────────────────────
+
+export type BookingNote = {
+  id: number;
+  content: string;
+  createdBy: string;
+  createdAt: string;
+};
+
+export type BookingMaterial = {
+  id: number;
+  itemName: string;
+  quantity: number;
+  unitCost: number;
+  subtotal: number;
+  note: string | null;
+};
+
+export type BookingPhoto = {
+  id: number;
+  mediaId: number;
+  url: string;
+  originalName: string | null;
+  altText: string | null;
+  displayOrder: number;
+  createdAt: string;
+};
+
+export type QuoteForm = {
+  quoteAmount: number;
+  depositAmount: number;
+};
+
+export type MaterialForm = {
+  itemName: string;
+  quantity: number;
+  unitCost: number;
+  note?: string;
+};
+
 // ── API Functions ───────────────────────────────────────────────
 
 /** Get all bookings (admin) */
@@ -99,9 +139,96 @@ export const getAllBookings = () => {
   return http.request<Booking[]>("get", "/api/admin/bookings");
 };
 
+/** Get single booking detail */
+export const getBookingDetail = (id: number) => {
+  return http.request<Booking>("get", `/api/admin/bookings/${id}`);
+};
+
 /** Update booking status (admin) */
 export const updateBookingStatus = (id: number, status: BookingStatusValue) => {
   return http.request<Booking>("patch", `/api/admin/bookings/${id}/status`, {
     params: { status }
   });
+};
+
+/** Submit quote for a booking (INQUIRY → QUOTED) */
+export const submitQuote = (id: number, data: QuoteForm) => {
+  return http.request<Booking>("patch", `/api/admin/bookings/${id}/quote`, {
+    data
+  });
+};
+
+// ── Notes ───────────────────────────────────────────────────────
+
+export const getBookingNotes = (id: number) => {
+  return http.request<BookingNote[]>("get", `/api/admin/bookings/${id}/notes`);
+};
+
+export const addBookingNote = (id: number, content: string) => {
+  return http.request<BookingNote>("post", `/api/admin/bookings/${id}/notes`, {
+    data: { content }
+  });
+};
+
+// ── Materials ───────────────────────────────────────────────────
+
+export const getBookingMaterials = (id: number) => {
+  return http.request<BookingMaterial[]>(
+    "get",
+    `/api/admin/bookings/${id}/materials`
+  );
+};
+
+export const addBookingMaterial = (id: number, data: MaterialForm) => {
+  return http.request<BookingMaterial>(
+    "post",
+    `/api/admin/bookings/${id}/materials`,
+    { data }
+  );
+};
+
+export const updateBookingMaterial = (
+  bookingId: number,
+  materialId: number,
+  data: MaterialForm
+) => {
+  return http.request<BookingMaterial>(
+    "put",
+    `/api/admin/bookings/${bookingId}/materials/${materialId}`,
+    { data }
+  );
+};
+
+export const deleteBookingMaterial = (
+  bookingId: number,
+  materialId: number
+) => {
+  return http.request<void>(
+    "delete",
+    `/api/admin/bookings/${bookingId}/materials/${materialId}`
+  );
+};
+
+// ── Photos ──────────────────────────────────────────────────────
+
+export const getBookingPhotos = (id: number) => {
+  return http.request<BookingPhoto[]>(
+    "get",
+    `/api/admin/bookings/${id}/photos`
+  );
+};
+
+export const addBookingPhoto = (id: number, mediaId: number) => {
+  return http.request<BookingPhoto>(
+    "post",
+    `/api/admin/bookings/${id}/photos`,
+    { data: { mediaId } }
+  );
+};
+
+export const deleteBookingPhoto = (bookingId: number, photoId: number) => {
+  return http.request<void>(
+    "delete",
+    `/api/admin/bookings/${bookingId}/photos/${photoId}`
+  );
 };
