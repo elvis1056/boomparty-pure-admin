@@ -139,6 +139,13 @@ export const getAllBookings = () => {
   return http.request<Booking[]>("get", "/api/admin/bookings");
 };
 
+/** Get bookings within a date range (for calendar view) */
+export const getBookingsByDateRange = (start: string, end: string) => {
+  return http.request<Booking[]>("get", "/api/admin/bookings/calendar", {
+    params: { start, end }
+  });
+};
+
 /** Get single booking detail */
 export const getBookingDetail = (id: number) => {
   return http.request<Booking>("get", `/api/admin/bookings/${id}`);

@@ -19,6 +19,15 @@ export default {
         title: "預約列表",
         icon: "ep/calendar"
       }
+    },
+    {
+      path: "/booking/calendar",
+      name: "BookingCalendar",
+      component: () => import("@/views/booking/calendar.vue"),
+      meta: {
+        title: "預約日曆",
+        icon: "ep/date-table"
+      }
     }
   ]
 } satisfies RouteConfigsTable;

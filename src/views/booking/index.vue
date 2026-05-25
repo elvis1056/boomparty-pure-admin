@@ -11,6 +11,7 @@ import {
   type BookingStatusValue
 } from "@/api/booking";
 import BookingDetail from "./BookingDetail.vue";
+import { getEventDate } from "./utils";
 
 // ── State ───────────────────────────────────────────────────────
 
@@ -67,14 +68,6 @@ const statusCounts = computed(() => {
   }
   return counts;
 });
-
-/** Get event date based on booking type */
-const getEventDate = (booking: Booking): string | null => {
-  if (booking.bookingType === "COMPLETION") {
-    return booking.completionTime;
-  }
-  return booking.performanceStart;
-};
 
 /** Apply all filters (tab + search + date range) */
 const filteredBookings = computed(() => {
