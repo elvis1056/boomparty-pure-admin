@@ -48,6 +48,11 @@
     "url": "https://github.com/xiaoxian521"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/timegrid": "^6.1.20",
+    "@fullcalendar/vue3": "^6.1.20",
     "@pureadmin/table": "^3.3.0",
     "@pureadmin/utils": "^2.6.2",
     "@vueuse/core": "^14.0.0",
