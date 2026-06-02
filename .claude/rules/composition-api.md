@@ -37,7 +37,7 @@ description: Use when writing Vue 3 Composition API code
 
    <!-- ✅ 正確 -->
    <script setup lang="ts">
-   const activeUsers = computed(() => users.value.filter(u => u.active));
+   const activeUsers = computed(() => users.value.filter(user => user.active));
    </script>
    <template>
      <div v-for="user in activeUsers" :key="user.id">
@@ -81,66 +81,8 @@ description: Use when writing Vue 3 Composition API code
    export function useTable() { ... }
    ```
 
-## 命名規範
-
-**❌ 禁止使用 handle 前綴**
-
-```typescript
-// ❌ 錯誤
-const handleSubmit = () => {};
-const handleDelete = id => {};
-
-// ✅ 正確
-const submitForm = () => {};
-const deleteProduct = id => {};
-const fetchProducts = async () => {};
-```
-
-## TypeScript
-
-**Interface 命名慣例**
-
-```typescript
-interface UserListProps {} // Props 加後綴
-interface User {} // 資料模型，不加後綴
-interface UserState {} // Store 狀態加後綴
-```
-
-**未使用參數加底線前綴**
-
-```typescript
-function Component({ used, _unused }: Props) {}
-```
-
-**不使用 nullish coalescing（??），用三元運算子**
-
-```typescript
-// ❌ 錯誤
-const value = data ?? defaultValue;
-
-// ✅ 正確
-const value = data !== null && data !== undefined ? data : defaultValue;
-```
-
 ## 樣式
 
 - 使用 `<style scoped>`，避免污染全域
 - 優先使用 Element Plus 元件與屬性，減少自訂樣式
 - 禁止 inline style（非必要情況）
-
-## 字串常數化
-
-```typescript
-// ❌ 錯誤：magic string
-if (status === "active") {
-}
-
-// ✅ 正確
-export const PRODUCT_STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive"
-} as const;
-
-if (status === PRODUCT_STATUS.ACTIVE) {
-}
-```
