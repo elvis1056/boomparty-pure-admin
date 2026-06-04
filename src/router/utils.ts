@@ -216,6 +216,7 @@ function initRouter() {
             resolve(router);
           })
           .catch(() => {
+            handleAsyncRoutes([]);
             resolve(router);
           });
       });
@@ -228,6 +229,7 @@ function initRouter() {
           resolve(router);
         })
         .catch(() => {
+          handleAsyncRoutes([]);
           resolve(router);
         });
     });
