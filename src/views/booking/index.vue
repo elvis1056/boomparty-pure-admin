@@ -12,6 +12,7 @@ import {
 } from "@/api/booking";
 import BookingDetail from "./BookingDetail.vue";
 import { getEventDate } from "./utils";
+import ArrowDownIcon from "~icons/ep/arrow-down";
 
 // ── State ───────────────────────────────────────────────────────
 
@@ -320,7 +321,7 @@ const sortByCreatedAt = (a: Booking, b: Booking): number => {
                 class="cursor-pointer"
               >
                 {{ BOOKING_STATUS[row.status].label }}
-                <el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+                <el-icon class="el-icon--right"><ArrowDownIcon /></el-icon>
               </el-tag>
               <template #dropdown>
                 <el-dropdown-menu>
