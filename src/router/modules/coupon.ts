@@ -1,5 +1,10 @@
+const Layout = () => import("@/layout/index.vue");
+
 export default {
   path: "/coupon",
+  name: "Coupon",
+  component: Layout,
+  redirect: "/coupon/list",
   meta: {
     title: "優惠碼",
     icon: "ri/coupon-3-line",

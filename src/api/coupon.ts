@@ -46,6 +46,3 @@ export const createCoupon = (data: CreateCouponRequest) =>
 
 export const updateCoupon = (id: number, data: CreateCouponRequest) =>
   http.request<Coupon>("put", `/api/admin/coupons/${id}`, { data });
-
-export const deactivateCoupon = (id: number) =>
-  http.request<void>("delete", `/api/admin/coupons/${id}`);

@@ -1,22 +1,32 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   getAllCoupons,
   createCoupon,
   updateCoupon,
-  deactivateCoupon,
   DISCOUNT_TYPE,
   type Coupon,
   type CreateCouponRequest,
   type DiscountType
 } from "@/api/coupon";
 import { getAllAffiliates, type Affiliate } from "@/api/affiliate";
+import CopyDocumentIcon from "~icons/ep/copy-document";
 
-// ─── 列表 ───
+// ── State ───────────────────────────────────────────────────────
+
 const loading = ref(false);
 const coupons = ref<Coupon[]>([]);
 const affiliates = ref<Affiliate[]>([]);
+
+// Filters
+const searchText = ref("");
+
+// Pagination
+const currentPage = ref(1);
+const pageSize = ref(5);
+
+// ── Data Fetching ───────────────────────────────────────────────
 
 const fetchCoupons = async () => {
   loading.value = true;
@@ -35,11 +45,110 @@ const fetchAffiliates = async () => {
     const data = await getAllAffiliates();
     affiliates.value = Array.isArray(data) ? data : [];
   } catch {
-    // 非必要，載入失敗不影響主流程
+    // Non-critical, don't block main flow
   }
 };
 
-// ─── 新增 / 編輯 Dialog ───
+onMounted(() => {
+  fetchCoupons();
+  fetchAffiliates();
+});
+
+// ── Computed ────────────────────────────────────────────────────
+
+type CouponStatus = {
+  label: string;
+  type: "success" | "warning" | "danger" | "info";
+};
+
+const getCouponStatus = (coupon: Coupon): CouponStatus => {
+  if (!coupon.isActive) {
+    return { label: "已停用", type: "info" };
+  }
+
+  const now = new Date();
+
+  if (coupon.validTo) {
+    const validTo = new Date(coupon.validTo);
+    if (validTo < now) {
+      return { label: "已過期", type: "danger" };
+    }
+  }
+
+  if (coupon.validFrom) {
+    const validFrom = new Date(coupon.validFrom);
+    if (validFrom > now) {
+      return { label: "未開始", type: "warning" };
+    }
+  }
+
+  return { label: "進行中", type: "success" };
+};
+
+/** Apply search filter (code + description) */
+const filteredCoupons = computed(() => {
+  if (!searchText.value) {
+    return coupons.value;
+  }
+  const keyword = searchText.value.toLowerCase();
+  return coupons.value.filter(coupon => {
+    const matchCode = coupon.code.toLowerCase().includes(keyword);
+    const matchDescription = coupon.description
+      ? coupon.description.toLowerCase().includes(keyword)
+      : false;
+    return matchCode || matchDescription;
+  });
+});
+
+// Sort (global, before pagination)
+const sortState = ref<{ prop: string; order: string | null }>({
+  prop: "createdAt",
+  order: "descending"
+});
+
+const onSortChange = ({
+  prop,
+  order
+}: {
+  prop: string;
+  order: string | null;
+}) => {
+  sortState.value = { prop, order };
+  currentPage.value = 1;
+};
+
+const sortedCoupons = computed(() => {
+  const { prop, order } = sortState.value;
+  if (!prop || !order) {
+    return filteredCoupons.value;
+  }
+  const list = [...filteredCoupons.value];
+  const direction = order === "ascending" ? 1 : -1;
+  list.sort((couponA, couponB) => {
+    const sortFieldA = (couponA as Record<string, unknown>)[prop];
+    const sortFieldB = (couponB as Record<string, unknown>)[prop];
+    if (sortFieldA === sortFieldB) {
+      return 0;
+    }
+    if (sortFieldA === null || sortFieldA === undefined) {
+      return 1;
+    }
+    if (sortFieldB === null || sortFieldB === undefined) {
+      return -1;
+    }
+    return sortFieldA < sortFieldB ? -direction : direction;
+  });
+  return list;
+});
+
+/** Paginated subset of sorted coupons */
+const paginatedCoupons = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value;
+  return sortedCoupons.value.slice(start, start + pageSize.value);
+});
+
+// ── Dialog (Create / Edit) ──────────────────────────────────────
+
 const dialogVisible = ref(false);
 const dialogTitle = ref("新增優惠碼");
 const editingId = ref<number | null>(null);
@@ -112,56 +221,128 @@ const submitForm = async () => {
   }
 };
 
-const confirmDeactivate = async (row: Coupon) => {
+// ── Actions ─────────────────────────────────────────────────────
+
+const buildCouponForm = (coupon: Coupon): CreateCouponRequest => {
+  return {
+    code: coupon.code,
+    discountType: coupon.discountType,
+    discountValue: coupon.discountValue,
+    minOrderAmount: coupon.minOrderAmount > 0 ? coupon.minOrderAmount : null,
+    maxUses: coupon.maxUses,
+    validFrom: coupon.validFrom,
+    validTo: coupon.validTo,
+    isActive: coupon.isActive,
+    affiliateId: coupon.affiliateId,
+    description: coupon.description
+  };
+};
+
+const toggleActive = async (coupon: Coupon) => {
+  const newValue = !coupon.isActive;
+  const label = newValue ? "啟用" : "停用";
   try {
     await ElMessageBox.confirm(
-      `確定停用優惠碼「${row.code}」？停用後無法再使用，但不會刪除歷史紀錄。`,
-      "停用確認",
+      `確定將優惠碼「${coupon.code}」${label}？`,
+      `${label}確認`,
       {
         type: "warning",
-        confirmButtonText: "確定停用",
+        confirmButtonText: "確定",
         cancelButtonText: "取消"
       }
     );
-    await deactivateCoupon(row.id);
-    ElMessage.success("已停用");
+    const couponForm = buildCouponForm(coupon);
+    couponForm.isActive = newValue;
+    await updateCoupon(coupon.id, couponForm);
+    ElMessage.success(`已${label}`);
     fetchCoupons();
   } catch {
-    // 取消操作
+    // User cancelled
   }
 };
 
-const formatDate = (dateStr: string | null) => {
-  if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("zh-TW", {
+const copyCode = async (code: string) => {
+  try {
+    await navigator.clipboard.writeText(code);
+    ElMessage.success("已複製");
+  } catch {
+    ElMessage.error("複製失敗");
+  }
+};
+
+const resetFilters = () => {
+  searchText.value = "";
+  currentPage.value = 1;
+};
+
+// ── Helpers ─────────────────────────────────────────────────────
+
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) {
+    return "—";
+  }
+  return new Date(dateString).toLocaleDateString("zh-TW", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
   });
 };
 
-const discountLabel = (coupon: Coupon) => {
+const discountLabel = (coupon: Coupon): string => {
   if (coupon.discountType === "PERCENTAGE") {
     return `${coupon.discountValue}%`;
   }
   return `NT$ ${coupon.discountValue.toLocaleString()}`;
 };
 
-onMounted(() => {
-  fetchCoupons();
-  fetchAffiliates();
-});
+const PERCENTAGE_MAX = 100;
+const FIXED_AMOUNT_MAX = 99999;
 </script>
 
 <template>
   <div class="p-4">
+    <!-- Header -->
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold">優惠碼管理</h2>
       <el-button type="primary" @click="openCreate">新增優惠碼</el-button>
     </div>
 
-    <el-table v-loading="loading" :data="coupons" border stripe>
-      <el-table-column prop="code" label="優惠碼" min-width="120" />
+    <!-- Search -->
+    <div class="mb-4 flex flex-wrap gap-3">
+      <el-input
+        v-model="searchText"
+        placeholder="搜尋優惠碼 / 說明"
+        clearable
+        style="width: 280px"
+        @input="currentPage = 1"
+      />
+      <el-button v-if="searchText" text @click="resetFilters">
+        清除篩選
+      </el-button>
+    </div>
+
+    <!-- Table -->
+    <el-table
+      v-loading="loading"
+      :data="paginatedCoupons"
+      border
+      stripe
+      :default-sort="{ prop: 'createdAt', order: 'descending' }"
+      @sort-change="onSortChange"
+    >
+      <el-table-column label="優惠碼" min-width="150">
+        <template #default="{ row }">
+          <span class="coupon-code">{{ row.code }}</span>
+          <el-button
+            size="small"
+            text
+            class="copy-button"
+            @click="copyCode(row.code)"
+          >
+            <el-icon><CopyDocumentIcon /></el-icon>
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="類型" width="130">
         <template #default="{ row }">
           {{ DISCOUNT_TYPE[row.discountType as DiscountType] }}
@@ -180,7 +361,7 @@ onMounted(() => {
           >
         </template>
       </el-table-column>
-      <el-table-column label="有效期" min-width="160">
+      <el-table-column label="有效期" min-width="180">
         <template #default="{ row }">
           {{ formatDate(row.validFrom) }} ～ {{ formatDate(row.validTo) }}
         </template>
@@ -190,11 +371,21 @@ onMounted(() => {
           {{ row.affiliateName !== null ? row.affiliateName : "—" }}
         </template>
       </el-table-column>
-      <el-table-column label="狀態" width="80">
+      <el-table-column label="狀態" width="100">
         <template #default="{ row }">
-          <el-tag :type="row.isActive ? 'success' : 'info'">
-            {{ row.isActive ? "啟用" : "停用" }}
+          <el-tag :type="getCouponStatus(row).type" size="small">
+            {{ getCouponStatus(row).label }}
           </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="啟用" width="80" align="center">
+        <template #default="{ row }">
+          <el-switch :model-value="row.isActive" @change="toggleActive(row)" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="createdAt" label="建立日期" width="120" sortable>
+        <template #default="{ row }">
+          {{ formatDate(row.createdAt) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
@@ -204,7 +395,7 @@ onMounted(() => {
             v-if="row.isActive"
             size="small"
             type="danger"
-            @click="confirmDeactivate(row)"
+            @click="toggleActive(row)"
           >
             停用
           </el-button>
@@ -212,8 +403,20 @@ onMounted(() => {
       </el-table-column>
     </el-table>
 
-    <!-- 新增 / 編輯 Dialog -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="520px">
+    <!-- Pagination -->
+    <div class="mt-4 flex justify-end">
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[5, 15, 30, 50]"
+        :total="filteredCoupons.length"
+        layout="total, sizes, prev, pager, next"
+        background
+      />
+    </div>
+
+    <!-- Create / Edit Dialog -->
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="640px">
       <el-form label-width="100px">
         <el-form-item label="優惠碼" required>
           <el-input
@@ -225,10 +428,10 @@ onMounted(() => {
         <el-form-item label="折扣類型">
           <el-select v-model="form.discountType" style="width: 200px">
             <el-option
-              v-for="(label, val) in DISCOUNT_TYPE"
-              :key="val"
+              v-for="(label, value) in DISCOUNT_TYPE"
+              :key="value"
               :label="label"
-              :value="val"
+              :value="value"
             />
           </el-select>
         </el-form-item>
@@ -242,7 +445,11 @@ onMounted(() => {
           <el-input-number
             v-model="form.discountValue"
             :min="0"
-            :max="form.discountType === 'PERCENTAGE' ? 100 : 99999"
+            :max="
+              form.discountType === 'PERCENTAGE'
+                ? PERCENTAGE_MAX
+                : FIXED_AMOUNT_MAX
+            "
             :precision="form.discountType === 'PERCENTAGE' ? 2 : 0"
             style="width: 160px"
           />
@@ -290,10 +497,10 @@ onMounted(() => {
             style="width: 200px"
           >
             <el-option
-              v-for="a in affiliates"
-              :key="a.id"
-              :label="`${a.name}（${a.referralCode}）`"
-              :value="a.id"
+              v-for="affiliate in affiliates"
+              :key="affiliate.id"
+              :label="`${affiliate.name}（${affiliate.referralCode}）`"
+              :value="affiliate.id"
             />
           </el-select>
         </el-form-item>
@@ -318,3 +525,16 @@ onMounted(() => {
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.coupon-code {
+  font-family: monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.copy-button {
+  padding: 2px;
+  margin-left: 4px;
+}
+</style>
