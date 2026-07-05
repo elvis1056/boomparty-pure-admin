@@ -9,7 +9,7 @@
 import { defineComponent } from "vue";
 import { ElConfigProvider } from "element-plus";
 import { ReDialog } from "@/components/ReDialog";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
+import zhTw from "element-plus/es/locale/lang/zh-tw";
 
 export default defineComponent({
   name: "app",
@@ -19,7 +19,7 @@ export default defineComponent({
   },
   computed: {
     currentLocale() {
-      return zhCn;
+      return zhTw;
     }
   }
 });
