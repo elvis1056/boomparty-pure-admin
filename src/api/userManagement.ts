@@ -29,3 +29,10 @@ export const updateUserStatus = (id: number, enabled: boolean) =>
 /** 刪除使用者（有訂單時後端會回傳錯誤） */
 export const deleteUser = (id: number) =>
   http.request<void>("delete", `/api/users/${id}`);
+
+/** 重設使用者密碼（回傳臨時密碼） */
+export const resetUserPassword = (id: number) =>
+  http.request<{ temporaryPassword: string }>(
+    "post",
+    `/api/users/${id}/reset-password`
+  );
