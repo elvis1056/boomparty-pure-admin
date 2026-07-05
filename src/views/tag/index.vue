@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {
   getTags,
   createTag,
+  updateTag,
   deleteTag,
   TAG_TYPE,
   type Tag,
@@ -12,6 +13,7 @@ import {
 
 const loading = ref(false);
 const tags = ref<Tag[]>([]);
+const searchQuery = ref("");
 
 const TAG_TYPE_LABEL: Record<TagType, string> = {
   CONTENT: "內容",
@@ -25,9 +27,26 @@ const TAG_TYPE_COLOR: Record<TagType, string> = {
   OCCASION: "warning"
 };
 
-// 新增表單
+const filteredTags = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) {
+    return tags.value;
+  }
+  return tags.value.filter(tag => {
+    return (
+      tag.name.toLowerCase().includes(query) ||
+      tag.slug.toLowerCase().includes(query)
+    );
+  });
+});
+
+// Create form
 const form = ref({ name: "", type: TAG_TYPE.CONTENT as TagType });
 const submitting = ref(false);
+
+// Inline edit state
+const editingTagId = ref<number | null>(null);
+const editForm = ref({ name: "", slug: "", type: TAG_TYPE.CONTENT as TagType });
 
 const fetchTags = async () => {
   loading.value = true;
@@ -62,6 +81,39 @@ const addTag = async () => {
   }
 };
 
+const startEdit = (tag: Tag) => {
+  editingTagId.value = tag.id;
+  editForm.value = { name: tag.name, slug: tag.slug, type: tag.type };
+};
+
+const cancelEdit = () => {
+  editingTagId.value = null;
+};
+
+const saveEdit = async (tag: Tag) => {
+  if (!editForm.value.name.trim()) {
+    ElMessage.warning("名稱不可為空");
+    return;
+  }
+  try {
+    const updated = await updateTag(tag.id, {
+      name: editForm.value.name.trim(),
+      type: editForm.value.type,
+      slug: editForm.value.slug
+    });
+    const index = tags.value.findIndex(
+      existingTag => existingTag.id === tag.id
+    );
+    if (index !== -1) {
+      tags.value[index] = updated;
+    }
+    editingTagId.value = null;
+    ElMessage.success("已更新");
+  } catch {
+    ElMessage.error("更新失敗");
+  }
+};
+
 const removeTag = async (tag: Tag) => {
   try {
     await ElMessageBox.confirm(
@@ -70,10 +122,10 @@ const removeTag = async (tag: Tag) => {
       { type: "warning", confirmButtonText: "刪除", cancelButtonText: "取消" }
     );
     await deleteTag(tag.id);
-    tags.value = tags.value.filter(t => t.id !== tag.id);
+    tags.value = tags.value.filter(existingTag => existingTag.id !== tag.id);
     ElMessage.success("已刪除");
   } catch {
-    // 取消刪除
+    // User cancelled
   }
 };
 
@@ -82,9 +134,17 @@ onMounted(fetchTags);
 
 <template>
   <div class="p-4">
-    <h2 class="mb-4 text-xl font-bold">標籤管理</h2>
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="text-xl font-bold">標籤管理</h2>
+      <el-input
+        v-model="searchQuery"
+        placeholder="搜尋名稱 / Slug"
+        clearable
+        style="width: 220px"
+      />
+    </div>
 
-    <!-- 新增表單 -->
+    <!-- Create form -->
     <div class="mb-6 flex items-center gap-3">
       <el-input
         v-model="form.name"
@@ -105,30 +165,89 @@ onMounted(fetchTags);
       </el-button>
     </div>
 
-    <!-- 標籤列表 -->
-    <el-table v-loading="loading" :data="tags" border stripe>
+    <!-- Tag list -->
+    <el-table v-loading="loading" :data="filteredTags" border stripe>
       <el-table-column prop="id" label="ID" width="70" />
-      <el-table-column prop="name" label="名稱" min-width="120" />
-      <el-table-column prop="slug" label="Slug" min-width="160" />
-      <el-table-column label="類型" width="100">
+
+      <el-table-column label="名稱" min-width="120">
         <template #default="{ row }">
-          <el-tag :type="TAG_TYPE_COLOR[row.type as TagType] as any">
-            {{ TAG_TYPE_LABEL[row.type as TagType] }}
+          <template v-if="editingTagId === row.id">
+            <el-input v-model="editForm.name" size="small" />
+          </template>
+          <template v-else>
+            <span class="editable-cell" @dblclick="startEdit(row)">
+              {{ row.name }}
+            </span>
+          </template>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="slug" label="Slug" min-width="160" />
+
+      <el-table-column label="類型" width="120">
+        <template #default="{ row }">
+          <template v-if="editingTagId === row.id">
+            <el-select v-model="editForm.type" size="small">
+              <el-option
+                v-for="(label, type) in TAG_TYPE_LABEL"
+                :key="type"
+                :label="label"
+                :value="type"
+              />
+            </el-select>
+          </template>
+          <template v-else>
+            <el-tag :type="TAG_TYPE_COLOR[row.type as TagType] as any">
+              {{ TAG_TYPE_LABEL[row.type as TagType] }}
+            </el-tag>
+          </template>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="使用中" width="90" align="center">
+        <template #default="{ row }">
+          <el-tag :type="row.usageCount > 0 ? 'success' : 'info'" size="small">
+            {{ row.usageCount }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="建立時間" width="160">
+
+      <el-table-column prop="createdAt" label="建立時間" width="120">
         <template #default="{ row }">
           {{ row.createdAt ? row.createdAt.slice(0, 10) : "—" }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100" fixed="right">
+
+      <el-table-column label="操作" width="180" fixed="right">
         <template #default="{ row }">
-          <el-button size="small" type="danger" @click="removeTag(row)">
-            刪除
-          </el-button>
+          <template v-if="editingTagId === row.id">
+            <el-button size="small" type="success" @click="saveEdit(row)">
+              儲存
+            </el-button>
+            <el-button size="small" @click="cancelEdit">取消</el-button>
+          </template>
+          <template v-else>
+            <el-button size="small" type="primary" @click="startEdit(row)">
+              編輯
+            </el-button>
+            <el-button size="small" type="danger" @click="removeTag(row)">
+              刪除
+            </el-button>
+          </template>
         </template>
       </el-table-column>
     </el-table>
   </div>
 </template>
+
+<style scoped>
+.editable-cell {
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.editable-cell:hover {
+  background-color: #f0f2f5;
+}
+</style>

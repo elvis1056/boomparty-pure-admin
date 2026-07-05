@@ -5,11 +5,25 @@ import { getCategories, deleteCategory, type Category } from "@/api/category";
 
 const loading = ref(false);
 const categories = ref<Category[]>([]);
+const searchQuery = ref("");
 
-// el-table 只顯示頂層分類，子分類已在各自的 children 陣列裡
 const topLevelCategories = computed(() =>
   categories.value.filter(category => category.parentId === null)
 );
+
+const filteredCategories = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) {
+    return topLevelCategories.value;
+  }
+  return topLevelCategories.value.filter(parent => {
+    const parentMatch = parent.name.toLowerCase().includes(query);
+    const childMatch =
+      parent.children &&
+      parent.children.some(child => child.name.toLowerCase().includes(query));
+    return parentMatch || childMatch;
+  });
+});
 
 const fetchCategories = async () => {
   loading.value = true;
@@ -47,14 +61,22 @@ onMounted(fetchCategories);
   <div class="p-4">
     <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold">分類列表</h2>
-      <el-button type="primary" @click="$router.push('/category/create')">
-        新增分類
-      </el-button>
+      <div class="flex items-center gap-3">
+        <el-input
+          v-model="searchQuery"
+          placeholder="搜尋分類名稱"
+          clearable
+          style="width: 220px"
+        />
+        <el-button type="primary" @click="$router.push('/category/create')">
+          新增分類
+        </el-button>
+      </div>
     </div>
 
     <el-table
       v-loading="loading"
-      :data="topLevelCategories"
+      :data="filteredCategories"
       border
       row-key="id"
       default-expand-all
@@ -63,7 +85,12 @@ onMounted(fetchCategories);
         ({ row }) => (row.parentId === null ? 'row-parent' : 'row-child')
       "
     >
-      <el-table-column prop="name" label="分類名稱" min-width="180" />
+      <el-table-column prop="name" label="分類名稱" min-width="180">
+        <template #default="{ row }">
+          <span v-if="row.parentId !== null" class="child-indicator">└</span>
+          {{ row.name }}
+        </template>
+      </el-table-column>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column
         prop="description"
@@ -102,15 +129,21 @@ onMounted(fetchCategories);
 </template>
 
 <style scoped>
-/* 頂層分類：淺灰底色 + 粗體 */
+/* Top-level: light grey background + bold */
 :deep(.row-parent) {
   font-weight: 600;
   background-color: #f5f7fa;
 }
 
-/* 子分類：字體略小、顏色稍淡 */
+/* Child rows: smaller font, muted color */
 :deep(.row-child) {
   font-size: 13px;
   color: #555;
+}
+
+.child-indicator {
+  margin-right: 4px;
+  font-family: monospace;
+  color: #c0c4cc;
 }
 </style>
