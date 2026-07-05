@@ -1,4 +1,5 @@
 import { http } from "@/utils/http";
+import type { Tag } from "@/api/tag";
 
 export type MediaAsset = {
   id: number;
@@ -10,6 +11,7 @@ export type MediaAsset = {
   width: number | null;
   height: number | null;
   altText: string | null;
+  tags: Tag[];
   createdAt: string;
 };
 
@@ -17,11 +19,23 @@ export type AltTextForm = {
   altText: string;
 };
 
+export type MediaUsageItem = {
+  id: number;
+  name: string;
+};
+
+export type MediaUsage = {
+  products: MediaUsageItem[];
+  categories: MediaUsageItem[];
+};
+
 /** 上傳圖片 */
 export const uploadMedia = (file: File, altText?: string) => {
   const formData = new FormData();
   formData.append("file", file);
-  if (altText) formData.append("altText", altText);
+  if (altText) {
+    formData.append("altText", altText);
+  }
   return http.request<MediaAsset>("post", "/api/admin/media/upload", {
     data: formData,
     headers: { "Content-Type": "multipart/form-data" }
@@ -43,6 +57,11 @@ export const updateAltText = (id: number, altText: string) => {
   return http.request<MediaAsset>("patch", `/api/admin/media/${id}/alt-text`, {
     data: { altText } satisfies AltTextForm
   });
+};
+
+/** 查詢圖片使用情況 */
+export const getMediaUsage = (id: number) => {
+  return http.request<MediaUsage>("get", `/api/admin/media/${id}/usage`);
 };
 
 /** 刪除圖片 */
