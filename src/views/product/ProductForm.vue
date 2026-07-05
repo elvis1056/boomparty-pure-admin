@@ -15,6 +15,8 @@ import {
 import type { MediaAsset } from "@/api/media";
 import draggable from "vuedraggable";
 import MediaPickerDialog from "@/components/MediaPickerDialog.vue";
+import DCaretIcon from "~icons/ep/d-caret";
+import DeleteIcon from "~icons/ep/delete";
 
 const props = defineProps<{
   mode: "create" | "edit";
@@ -193,7 +195,7 @@ onMounted(fetchCategories);
               <div
                 class="drag-handle absolute left-0 top-0 flex h-6 w-full cursor-grab items-center justify-center bg-black/20 text-white"
               >
-                <el-icon size="12"><i-ep-d-caret /></el-icon>
+                <el-icon size="12"><DCaretIcon /></el-icon>
               </div>
               <img
                 :src="img.url"
@@ -226,7 +228,7 @@ onMounted(fetchCategories);
                   class="!px-1"
                   @click="removeImage(img)"
                 >
-                  <el-icon><i-ep-delete /></el-icon>
+                  <el-icon><DeleteIcon /></el-icon>
                 </el-button>
               </div>
             </div>

@@ -11,9 +11,9 @@ const loading = ref(false);
 const submitCreate = async (data: ProductForm) => {
   loading.value = true;
   try {
-    await createProduct(data);
-    ElMessage.success("新增成功");
-    router.push("/product/list");
+    const product = await createProduct(data);
+    ElMessage.success("新增成功，可繼續上傳圖片");
+    router.replace(`/product/edit/${product.id}`);
   } catch {
     ElMessage.error("新增失敗");
   } finally {
