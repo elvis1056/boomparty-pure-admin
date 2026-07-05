@@ -35,6 +35,7 @@ export type Order = {
   postalCode: string;
   addressLine: string;
   note: string | null;
+  adminNote: string | null;
   couponCode: string | null;
   discountAmount: number;
   affiliateReferralCode: string | null;
@@ -79,5 +80,12 @@ export const getOrderDetail = (id: number) => {
 export const updateOrderStatus = (id: number, status: OrderStatusValue) => {
   return http.request<Order>("patch", `/api/admin/orders/${id}/status`, {
     params: { status }
+  });
+};
+
+/** 更新管理員備註 */
+export const updateOrderNote = (id: number, note: string) => {
+  return http.request<Order>("patch", `/api/admin/orders/${id}/note`, {
+    params: { note }
   });
 };
